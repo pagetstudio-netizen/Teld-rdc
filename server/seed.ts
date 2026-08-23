@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, products, tasks, paymentChannels, platformSettings, countries, stakingProducts } from "@shared/schema";
+import { users, tasks, paymentChannels, platformSettings, countries, stakingProducts } from "@shared/schema";
 import bcrypt from "bcrypt";
 import { eq, sql } from "drizzle-orm";
 import { migrateToRdcCdf } from "./rdc-cdf-migration";
@@ -83,25 +83,6 @@ export async function seed() {
   await migrateToRdcCdf();
   await activateWestpayForRdc();
   await migrateReferralBonusDefaults();
-
-  // Seed products only if table is empty (first install only — never overwrite admin changes)
-  const existingProducts = await db.select().from(products);
-  if (existingProducts.length === 0) {
-    const defaultProducts = [
-      { name: "Bonus Gratuit", price: 0, dailyEarnings: 204, cycleDays: 1, totalReturn: 204, isFree: true, sortOrder: 0 },
-      { name: "VIP 1", price: 16320, dailyEarnings: 1224, cycleDays: 90, totalReturn: 110160, sortOrder: 1 },
-      { name: "VIP 2", price: 40800, dailyEarnings: 3264, cycleDays: 90, totalReturn: 293760, sortOrder: 2 },
-      { name: "VIP 3", price: 61200, dailyEarnings: 6120, cycleDays: 90, totalReturn: 550800, sortOrder: 3 },
-      { name: "VIP 4", price: 102000, dailyEarnings: 8160, cycleDays: 90, totalReturn: 734400, sortOrder: 4 },
-      { name: "VIP 5", price: 163200, dailyEarnings: 14280, cycleDays: 90, totalReturn: 1285200, sortOrder: 5 },
-      { name: "VIP 6", price: 408000, dailyEarnings: 40800, cycleDays: 90, totalReturn: 3672000, sortOrder: 6 },
-      { name: "VIP 7", price: 1020000, dailyEarnings: 122400, cycleDays: 90, totalReturn: 11016000, sortOrder: 7 },
-    ];
-    await db.insert(products).values(defaultProducts);
-    console.log("Products seeded (first install)");
-  } else {
-    console.log(`Products skipped — ${existingProducts.length} existing products preserved`);
-  }
 
   // Seed tasks only if table is empty (first install only — never overwrite admin changes)
   const existingTasks = await db.select().from(tasks);

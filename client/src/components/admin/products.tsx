@@ -168,7 +168,7 @@ export default function AdminProducts() {
         )} />
         <FormField control={form.control} name="dailyEarnings" render={({ field }) => (
           <FormItem>
-            <FormLabel>Gains/jour (F)</FormLabel>
+            <FormLabel>Gains/jour (CDF)</FormLabel>
             <FormControl><Input {...field} type="number" placeholder="Ex: 300" /></FormControl>
             <FormMessage />
           </FormItem>
