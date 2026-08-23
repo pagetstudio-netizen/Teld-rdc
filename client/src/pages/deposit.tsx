@@ -7,7 +7,7 @@ import {
   ChevronLeft, Info, Copy, CheckCircle, Upload, Phone, Loader2,
   ImageIcon, ArrowRight, Zap, RefreshCw, ExternalLink, History,
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { COUNTRIES, type ApiCountry } from "@/lib/countries";
 import type { PaymentNumber } from "@shared/schema";
 import rechargeReference from "@assets/images_(76)_1787505744618.jpeg";
@@ -48,6 +48,7 @@ export default function DepositPage() {
   const { user, refreshUser } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, navigate] = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState<Step>("amount");
@@ -500,8 +501,7 @@ export default function DepositPage() {
       return;
     }
 
-    setSelectedNumber(null);
-    setStep("westpay");
+    navigate(`/robotpay?amount=${Number(amount)}&country=${encodeURIComponent(country)}`);
   };
 
   const getOperatorIcon = (name: string): string | null => {

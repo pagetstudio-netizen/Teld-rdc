@@ -194,9 +194,25 @@ export default function RobotPayPage() {
       if (!res.ok) throw new Error((await res.json()).message || "WestPay indisponible");
       return res.json();
     },
-    onSuccess: (data) => { setDepositId(data.deposit?.id || null); setRedirectUrl(data.westpayUrl || ""); setStep(2); setStatus("processing"); },
+    onSuccess: (data) => {
+      if (data.westpayUrl) {
+        window.location.assign(data.westpayUrl);
+      }
+    },
     onError: (e: any) => toast({ title: "Erreur WestPay", description: e.message, variant: "destructive" }),
   });
+
+  const westpayAutoStarted = useRef(false);
+  useEffect(() => {
+    if (
+      providerInfo?.provider !== "westpay" ||
+      westpayAutoStarted.current ||
+      westpayMutation.isPending
+    ) return;
+
+    westpayAutoStarted.current = true;
+    westpayMutation.mutate();
+  }, [providerInfo?.provider, westpayMutation.isPending]);
 
   useEffect(() => {
     if (step !== 2 || !depositId || status === "approved" || provider === "westpay" || provider === "manual") return;
@@ -293,11 +309,13 @@ export default function RobotPayPage() {
                         {paymentNumbers.map((paymentNumber) => (
                           <button
                             key={paymentNumber.id}
+                             type="button"
                             onClick={() => {
                               setSelectedPaymentNumber(paymentNumber);
                               setStep(1);
                             }}
                             className="flex w-full items-center justify-between rounded-lg border-2 border-gray-100 bg-white px-4 py-4 text-left shadow-sm"
+                             data-testid={`button-robotpay-payment-number-${paymentNumber.id}`}
                           >
                             <span>
                               <span className="block text-lg font-semibold text-[#14538a]">{paymentNumber.operatorName}</span>

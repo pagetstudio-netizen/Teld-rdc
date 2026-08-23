@@ -48,3 +48,10 @@ Keep the WestPay and SendavaPay cards visible in the admin settings so an admini
 **Why:** Operations need to stop or resume a provider without a deployment, while credentials must never be exposed through the browser or stored in settings.
 
 **How to apply:** The cards may edit activation, display name, and supported-country settings only. Keep API keys and webhook secrets exclusively in server environment secrets.
+
+## Deposit routing priority
+When WestPay is active for RDC, confirming a deposit amount sends the user through `/robotpay` and redirects directly to WestPay. This takes precedence over manual payment numbers. SendavaPay uses the `/robotpay` SDK flow when WestPay is unavailable or disabled; manual numbers are the fallback in that same flow.
+
+**Why:** The user requested no WestPay confirmation page after entering an amount, while retaining one central `/robotpay` path for manual and SDK-based deposits.
+
+**How to apply:** Do not reintroduce a separate WestPay confirmation screen. Preserve WestPay’s automatic priority and keep manual-number selection inside `/robotpay`.
