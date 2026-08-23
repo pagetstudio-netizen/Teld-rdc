@@ -100,7 +100,7 @@ export default function DepositPage() {
     : COUNTRIES.find(c => c.code === country);
   const currency = countryInfo?.currency || "CDF";
 
-  const { data: platformSettings } = useQuery<Record<string, string>>({
+  const { data: platformSettings, isLoading: platformSettingsLoading } = useQuery<Record<string, string>>({
     queryKey: ["/api/settings"],
   });
   const MIN_DEPOSIT = parseInt(platformSettings?.minDeposit || "12240");
@@ -501,6 +501,13 @@ export default function DepositPage() {
       return;
     }
 
+    if (platformSettingsLoading) return;
+
+    if (westpayAvailable) {
+      wpInitiateMutation.mutate();
+      return;
+    }
+
     navigate(`/robotpay?amount=${Number(amount)}&country=${encodeURIComponent(country)}`);
   };
 
@@ -858,9 +865,9 @@ export default function DepositPage() {
             type="button"
             className="confirm"
             onClick={handleAmountNext}
-            disabled={!amount || Number(amount) < MIN_DEPOSIT || !depositCountry}
+            disabled={!amount || Number(amount) < MIN_DEPOSIT || !depositCountry || platformSettingsLoading || wpInitiateMutation.isPending}
           >
-            Confirmer
+            {wpInitiateMutation.isPending ? <Loader2 className="mx-auto h-7 w-7 animate-spin" /> : "Confirmer"}
           </button>
 
           <Link href="/history" className="help-link">

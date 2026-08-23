@@ -17,6 +17,9 @@ type ProviderInfo = {
   providers?: Array<{ provider: AutomaticProvider; name: string }>;
 };
 
+const normalizeOperatorName = (name: string) =>
+  name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
 function Stepper({ step }: { step: number }) {
   return (
     <div className="flex items-center justify-between mb-7">
@@ -75,8 +78,6 @@ export default function RobotPayPage() {
   const automaticProviders = providerInfo?.providers ||
     (providerInfo && providerInfo.provider !== "manual" ? [{ provider: providerInfo.provider, name: providerInfo.name } as { provider: AutomaticProvider; name: string }] : []);
   const provider = manualMode ? "manual" : selectedAutomaticProvider || providerInfo?.provider || "manual";
-  const automaticProviderAvailable = automaticProviders.length > 0;
-  const activeAutomaticName = automaticProviders.find((item) => item.provider === provider)?.name || providerInfo?.name;
   const countryInfo = getCountryByCode(country, countries);
   const currency = countryInfo?.currency || "CDF";
   const phonePrefix = countryInfo?.phonePrefix || "";
@@ -108,7 +109,29 @@ export default function RobotPayPage() {
   const operators: Operator[] = provider === "ashtech"
     ? ((ashtechData || []).find(c => c.code?.toUpperCase() === country)?.operators || []).map((x: any) => typeof x === "string" ? { name: x, id: x } : x)
     : (sendavaData?.data || []).filter((x: Operator) => x.status === "online");
-  const loadingOperators = sendavaLoading || ashtechLoading || !providerInfo;
+  const configuredOperators: Operator[] = paymentNumbers.map((paymentNumber) => ({
+    id: `payment-number-${paymentNumber.id}`,
+    name: paymentNumber.operatorName,
+  }));
+  const operatorOptions: Operator[] = provider === "manual"
+    ? configuredOperators
+    : provider === "sendavapay"
+      ? [...operators, ...configuredOperators]
+      : operators;
+  const uniqueOperatorOptions = operatorOptions.filter((op, index, list) => {
+    const key = normalizeOperatorName(op.name || op.code || "");
+    return list.findIndex((candidate) => normalizeOperatorName(candidate.name || candidate.code || "") === key) === index;
+  });
+  const paymentNumberForOperator = (selectedOperator: Operator) => {
+    const selectedName = normalizeOperatorName(selectedOperator.name || selectedOperator.code || "");
+    return paymentNumbers.find((paymentNumber) => {
+      const configuredName = normalizeOperatorName(paymentNumber.operatorName);
+      return configuredName === selectedName ||
+        configuredName.includes(selectedName) ||
+        selectedName.includes(configuredName);
+    });
+  };
+  const loadingOperators = sendavaLoading || ashtechLoading || paymentNumbersLoading || !providerInfo;
 
   const sendavaMutation = useMutation({
     mutationFn: async () => {
@@ -297,50 +320,10 @@ export default function RobotPayPage() {
           {step > 0 && <Stepper step={Math.max(0, Math.min(2, step - 1))} />}
            {step === 0 && (
              <div className="space-y-5">
-               <p className="px-1 text-xl text-white">
-                 {provider === "manual" ? "Choisissez le numéro de paiement :" : "Sélectionnez le mode de paiement :"}
-               </p>
-                {provider === "manual" ? (
-                  <>
-                    {loadingOperators || paymentNumbersLoading ? <Loader2 className="w-7 h-7 animate-spin mx-auto text-blue-500" /> : paymentNumbers.length === 0 ? (
-                      <p className="rounded-lg bg-white p-4 text-center text-gray-600">Aucun numéro de paiement RDC actif n’est disponible pour le moment.</p>
-                    ) : (
-                      <div className="space-y-3">
-                        {paymentNumbers.map((paymentNumber) => (
-                          <button
-                            key={paymentNumber.id}
-                             type="button"
-                            onClick={() => {
-                              setSelectedPaymentNumber(paymentNumber);
-                              setStep(1);
-                            }}
-                            className="flex w-full items-center justify-between rounded-lg border-2 border-gray-100 bg-white px-4 py-4 text-left shadow-sm"
-                             data-testid={`button-robotpay-payment-number-${paymentNumber.id}`}
-                          >
-                            <span>
-                              <span className="block text-lg font-semibold text-[#14538a]">{paymentNumber.operatorName}</span>
-                              <span className="block text-sm text-gray-700">{paymentNumber.phone}</span>
-                              <span className="block text-xs text-gray-500">{paymentNumber.ownerName}</span>
-                            </span>
-                            <ChevronRight className="text-gray-400" />
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    {automaticProviderAvailable && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setManualMode(false);
-                          setSelectedPaymentNumber(null);
-                        }}
-                        className="w-full rounded-lg border border-white/70 bg-white/15 px-4 py-3 text-sm font-semibold text-white"
-                      >
-                        Utiliser {activeAutomaticName || "le paiement automatique"} à la place
-                      </button>
-                    )}
-                  </>
-               ) : provider === "westpay" ? (
+                <p className="px-1 text-xl text-white">
+                  {provider === "manual" ? "Sélectionnez votre opérateur :" : "Sélectionnez le mode de paiement :"}
+                </p>
+                {provider === "westpay" ? (
                  loadingOperators ? <Loader2 className="w-7 h-7 animate-spin mx-auto text-blue-500" /> : (
                    <button onClick={() => setStep(1)} className="flex w-full items-center justify-between rounded-lg border-2 border-gray-100 bg-white px-4 py-4 text-left shadow-sm">
                      <span className="text-lg font-semibold text-[#14538a]">{providerInfo?.name || "WestPay"}</span>
@@ -348,22 +331,15 @@ export default function RobotPayPage() {
                    </button>
                  )
                ) : (
-                 loadingOperators ? <Loader2 className="w-7 h-7 animate-spin mx-auto text-blue-500" /> : operators.length === 0 ? <p className="text-center text-gray-500">Aucun opérateur disponible pour ce pays.</p> : (
-                   <div className="space-y-3">{operators.map((op, i) => <button key={`${op.id || op.name}-${i}`} onClick={() => { setOperator(op); setStep(1); }} className={`w-full flex items-center justify-between rounded-lg px-4 py-4 border-2 text-left ${operator === op ? "border-[#2885d8] bg-blue-50" : "border-gray-100 bg-white shadow-sm"}`}><span className="font-semibold text-lg text-[#14538a]">{op.name || op.code}</span><ChevronRight className="text-gray-400" /></button>)}</div>
+                  loadingOperators ? <Loader2 className="w-7 h-7 animate-spin mx-auto text-blue-500" /> : uniqueOperatorOptions.length === 0 ? <p className="rounded-lg bg-white p-4 text-center text-gray-600">Aucun opérateur disponible pour le moment.</p> : (
+                    <div className="space-y-3">{uniqueOperatorOptions.map((op, i) => <button key={`${op.id || op.name}-${i}`} onClick={() => {
+                      const configuredNumber = paymentNumberForOperator(op);
+                      setOperator(op);
+                      setSelectedPaymentNumber(configuredNumber || null);
+                      setManualMode(Boolean(configuredNumber));
+                      setStep(1);
+                    }} className={`w-full flex items-center justify-between rounded-lg px-4 py-4 border-2 text-left ${operator === op ? "border-[#2885d8] bg-blue-50" : "border-gray-100 bg-white shadow-sm"}`}><span className="font-semibold text-lg text-[#14538a]">{op.name || op.code}</span><ChevronRight className="text-gray-400" /></button>)}</div>
                  )
-                )}
-                {provider !== "manual" && !paymentNumbersLoading && paymentNumbers.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setManualMode(true);
-                      setSelectedPaymentNumber(null);
-                    }}
-                    className="w-full rounded-lg border border-white/70 bg-white/15 px-4 py-3 text-left text-white"
-                  >
-                    <span className="block font-semibold">Paiement manuel</span>
-                    <span className="block text-xs opacity-90">Transférez vers un numéro RDC puis envoyez votre capture.</span>
-                  </button>
                 )}
                 {provider !== "manual" && automaticProviders.filter((item) => item.provider !== provider).map((item) => (
                   <button
