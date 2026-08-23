@@ -98,6 +98,24 @@ function getRouteParam(req: Request, name: string): string {
   const value = req.params[name];
   return Array.isArray(value) ? value[0] ?? "" : value ?? "";
 }
+
+function getPublicAppBaseUrl(req: Request): string {
+  const configuredUrl = process.env.PUBLIC_APP_URL?.trim();
+  if (configuredUrl) {
+    try {
+      const parsedUrl = new URL(configuredUrl);
+      if (parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:") {
+        return parsedUrl.origin;
+      }
+    } catch {
+      console.warn("[app url] PUBLIC_APP_URL invalide, utilisation de l'URL de la requête");
+    }
+  }
+
+  const forwardedProtocol = req.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const protocol = forwardedProtocol === "https" ? "https" : req.protocol;
+  return `${protocol}://${req.get("host")}`;
+}
 // --- end brute-force protection ---
 
 async function creditApprovedDeposit(deposit: { id: number; userId: number; amount: number }) {
@@ -981,7 +999,7 @@ export async function registerRoutes(
           if (!process.env.WESTPAY_MERCHANT_SLUG) {
             return res.status(400).json({ message: "WestPay non configuré : la variable WESTPAY_MERCHANT_SLUG doit être définie sur le serveur", westpay: true });
           }
-          const baseUrl = `${req.protocol}://${req.get("host")}`;
+          const baseUrl = getPublicAppBaseUrl(req);
           // Create deposit to get an ID, then build the redirect URL
           const deposit = await storage.createDeposit({
             userId: req.session.userId!,
@@ -1602,7 +1620,7 @@ export async function registerRoutes(
   app.get("/api/westpay/callback", requireAuth, async (req, res) => {
     try {
       const { depositId, status, ref } = req.query as Record<string, string>;
-      const baseUrl = `${req.protocol}://${req.get("host")}`;
+      const baseUrl = getPublicAppBaseUrl(req);
       if (!depositId) return res.redirect(`${baseUrl}/deposit?wp_status=error`);
       const deposit = await storage.getDeposit(parseInt(depositId));
       if (!deposit) return res.redirect(`${baseUrl}/deposit?wp_status=error`);
@@ -1617,7 +1635,7 @@ export async function registerRoutes(
       res.redirect(`${baseUrl}/deposit?wp_status=${wpStatus}&wp_depositId=${depositId}`);
     } catch (err: any) {
       console.error("[westpay callback] error:", err);
-      const baseUrl = `${req.protocol}://${req.get("host")}`;
+      const baseUrl = getPublicAppBaseUrl(req);
       res.redirect(`${baseUrl}/deposit?wp_status=error`);
     }
   });
