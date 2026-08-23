@@ -13,9 +13,10 @@ description: WestPay hosted-payment flow integrated alongside SendavaPay — dep
 5. Server stores westpayReference = ref, redirects to /deposit?wp_status=success
 6. Webhook POST /api/webhooks/westpay (X-RobotPay-Signature HMAC-SHA256) confirms → approve deposit
 
-**Withdrawal flow (per-country API key):**
-- POST https://westpay.cfd/api/merchant/transfer with X-API-KEY header
-- Each country has its own Replit Secret: WESTPAY_API_KEY_TG, WESTPAY_API_KEY_CM, etc.
+**Withdrawal capability:**
+- The WestPay transfer helper supports `POST https://westpay.cfd/api/merchant/transfer` with an `X-API-KEY` header.
+- The current application approval path remains manual: admin/banker approval changes the withdrawal state but does not automatically invoke the transfer helper.
+- Each country has its own secret when automatic transfers are later enabled; the RDC-only deployment only needs the CD key.
 
 ## Secrets required (all in Replit Secrets, never in code/DB)
 - WESTPAY_MERCHANT_SLUG — merchant slug for payment URL
@@ -26,7 +27,7 @@ description: WestPay hosted-payment flow integrated alongside SendavaPay — dep
 - westpayEnabled: "true"/"false"
 - westpayChannelName: display name (default "WestPay")
 - westpayCountries: comma-separated codes, empty = all countries
-- westpayWebhookSecret: fallback if WESTPAY_WEBHOOK_SECRET not set
+- westpayWebhookSecret: fallback if WESTPAY_WEBHOOK_SECRET is not set
 
 ## Key files
 - server/westpay.ts — all WestPay logic (buildPaymentUrl, transfer, verifyWebhookSignature, formatMsisdn)
@@ -34,9 +35,16 @@ description: WestPay hosted-payment flow integrated alongside SendavaPay — dep
 - shared/schema.ts — deposits.westpayReference column
 - server/storage.ts — getDepositByWestpayReference()
 - client/src/pages/deposit.tsx — "westpay" step, wpInitiateMutation, wp_status handling
-- client/src/components/admin/settings.tsx — WestPay card with toggle, countries, webhook secret
+- client/src/components/admin/settings.tsx — WestPay card with toggle and countries; secrets remain server-only
 
 **Why:**
 WestPay uses X-RobotPay-Signature (not x-westpay-signature) in webhook headers.
 The webhook signature is HMAC-SHA256 of the raw JSON body (not stringified twice).
 Webhook secret is single/global; API keys are per-country for withdrawals.
+
+## Administration controls
+Keep the WestPay and SendavaPay cards visible in the admin settings so an administrator can enable or disable each payment aggregator at runtime.
+
+**Why:** Operations need to stop or resume a provider without a deployment, while credentials must never be exposed through the browser or stored in settings.
+
+**How to apply:** The cards may edit activation, display name, and supported-country settings only. Keep API keys and webhook secrets exclusively in server environment secrets.

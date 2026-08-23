@@ -158,6 +158,8 @@ const PUBLIC_SETTING_KEYS = new Set([
   "signupBonus", "minDeposit", "minWithdrawal", "withdrawalFees",
   "maxWithdrawalsPerDay", "withdrawalStartHour", "withdrawalEndHour",
   "level1Commission", "level2Commission", "level3Commission",
+  "sendavapayEnabled", "sendavapayChannelName",
+  "westpayEnabled", "westpayChannelName", "westpayCountries",
 ]);
 const ADMIN_SETTING_KEYS = new Set([
   ...Array.from(PUBLIC_SETTING_KEYS),

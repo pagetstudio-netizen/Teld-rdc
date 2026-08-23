@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Loader2, Save, Link, Clock, Users } from "lucide-react";
+import { Loader2, Save, Link, Clock, Users, Zap } from "lucide-react";
 
 const NETWORKS = [
   { value: "telegram", label: "Telegram" },
@@ -51,6 +51,11 @@ const settingsSchema = z.object({
   level1Commission: z.string().min(1, "Commission requise"),
   level2Commission: z.string().min(1, "Commission requise"),
   level3Commission: z.string().min(1, "Commission requise"),
+  sendavapayEnabled: z.boolean(),
+  sendavapayChannelName: z.string().min(1, "Nom requis"),
+  westpayEnabled: z.boolean(),
+  westpayChannelName: z.string().min(1, "Nom requis"),
+  westpayCountries: z.string(),
 });
 
 type SettingsForm = z.infer<typeof settingsSchema>;
@@ -96,6 +101,11 @@ export default function AdminSettings({ isSuperAdmin }: AdminSettingsProps) {
        level1Commission: "20",
        level2Commission: "5",
        level3Commission: "2",
+      sendavapayEnabled: false,
+      sendavapayChannelName: "SendavaPay",
+      westpayEnabled: true,
+      westpayChannelName: "WestPay",
+      westpayCountries: "CD",
     },
   });
 
@@ -129,6 +139,11 @@ export default function AdminSettings({ isSuperAdmin }: AdminSettingsProps) {
         level1Commission: settings.level1Commission || "20",
         level2Commission: settings.level2Commission || "5",
         level3Commission: settings.level3Commission || "2",
+        sendavapayEnabled: settings.sendavapayEnabled === "true",
+        sendavapayChannelName: settings.sendavapayChannelName || "SendavaPay",
+        westpayEnabled: settings.westpayEnabled === "true",
+        westpayChannelName: settings.westpayChannelName || "WestPay",
+        westpayCountries: settings.westpayCountries || "CD",
       });
     }
   }, [settings, form]);
@@ -141,6 +156,8 @@ export default function AdminSettings({ isSuperAdmin }: AdminSettingsProps) {
         support2Enabled: String(data.support2Enabled),
         channelEnabled: String(data.channelEnabled),
         groupEnabled: String(data.groupEnabled),
+        sendavapayEnabled: String(data.sendavapayEnabled),
+        westpayEnabled: String(data.westpayEnabled),
       };
       const response = await apiRequest("POST", "/api/admin/settings", serialized);
       if (!response.ok) {
@@ -454,6 +471,98 @@ export default function AdminSettings({ isSuperAdmin }: AdminSettingsProps) {
                   <FormMessage />
                 </FormItem>
               )} />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ── Agrégateurs de paiement ── */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Zap className="w-5 h-5 text-orange-500" />
+              Agrégateurs de paiement
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* SendavaPay */}
+            <div className="space-y-4 rounded-xl border p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">SendavaPay</p>
+                  <p className="text-xs text-gray-500">
+                    Paiement automatique Mobile Money pour les utilisateurs RDC
+                  </p>
+                </div>
+                <FormField control={form.control} name="sendavapayEnabled" render={({ field }) => (
+                  <FormItem className="flex items-center gap-2 space-y-0">
+                    <FormLabel className="text-xs text-gray-500 whitespace-nowrap">
+                      {field.value ? "Actif" : "Désactivé"}
+                    </FormLabel>
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                  </FormItem>
+                )} />
+              </div>
+              <FormField control={form.control} name="sendavapayChannelName" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nom du canal affiché</FormLabel>
+                  <FormControl><Input {...field} placeholder="SendavaPay" /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <div className="rounded-xl bg-orange-50 border border-orange-100 p-3 text-xs text-orange-700 space-y-1">
+                <p className="font-semibold">Configuration SendavaPay</p>
+                <p>Pays configuré : <strong>RDC (CD)</strong></p>
+                <p>Ajoutez <code className="bg-orange-100 px-1 rounded">SENDAVAPAY_API_KEY</code> dans les Secrets du serveur.</p>
+                <p>Le secret webhook doit rester dans <code className="bg-orange-100 px-1 rounded">SENDAVAPAY_WEBHOOK_SECRET</code>.</p>
+                <p>Webhook : <code className="bg-orange-100 px-1 rounded">/api/webhooks/sendavapay</code></p>
+              </div>
+            </div>
+
+            {/* WestPay */}
+            <div className="space-y-4 rounded-xl border p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">WestPay</p>
+                  <p className="text-xs text-gray-500">
+                    Paiement Mobile Money par redirection vers la page sécurisée
+                  </p>
+                </div>
+                <FormField control={form.control} name="westpayEnabled" render={({ field }) => (
+                  <FormItem className="flex items-center gap-2 space-y-0">
+                    <FormLabel className="text-xs text-gray-500 whitespace-nowrap">
+                      {field.value ? "Actif" : "Désactivé"}
+                    </FormLabel>
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                  </FormItem>
+                )} />
+              </div>
+              <FormField control={form.control} name="westpayChannelName" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nom du canal affiché</FormLabel>
+                  <FormControl><Input {...field} placeholder="WestPay" /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="westpayCountries" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Pays activés</FormLabel>
+                  <FormControl><Input {...field} placeholder="CD" /></FormControl>
+                  <FormDescription className="text-xs">
+                    Pour la plateforme RDC, utilisez le code <strong>CD</strong>. Laissez vide pour tous les pays pris en charge.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <div className="rounded-xl bg-orange-50 border border-orange-100 p-3 text-xs text-orange-700 space-y-1">
+                <p className="font-semibold">Configuration WestPay</p>
+                <p>Ajoutez <code className="bg-orange-100 px-1 rounded">WESTPAY_MERCHANT_SLUG</code> dans les Secrets du serveur.</p>
+                <p>La clé de retrait et le secret webhook doivent rester dans les Secrets du serveur.</p>
+                <p>Webhook : <code className="bg-orange-100 px-1 rounded">/api/webhooks/westpay</code></p>
+              </div>
             </div>
           </CardContent>
         </Card>
