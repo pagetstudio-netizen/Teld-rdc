@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Plus, Edit, Trash2, Phone, Loader2, Eye, EyeOff } from "lucide-react";
@@ -17,6 +18,7 @@ interface Country {
   name: string;
   currency: string;
   phonePrefix: string;
+  operators: string;
   isActive: boolean;
 }
 
@@ -39,9 +41,24 @@ export default function AdminPaymentNumbers() {
     queryKey: ["/api/admin/payment-numbers"],
   });
 
-  const { data: countries = [] } = useQuery<Country[]>({
+  const { data: countries = [], isLoading: countriesLoading } = useQuery<Country[]>({
     queryKey: ["/api/countries"],
   });
+
+  const rdcCountry = countries.find((country) => country.code.toUpperCase() === "CD");
+  const configuredOperators = (() => {
+    if (!rdcCountry?.operators) return [];
+    try {
+      const parsed = JSON.parse(rdcCountry.operators);
+      return Array.isArray(parsed)
+        ? parsed
+          .map((operator) => String(operator).trim())
+          .filter((operator, index, list) => operator && list.indexOf(operator) === index)
+        : [];
+    } catch {
+      return [];
+    }
+  })();
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -219,8 +236,36 @@ export default function AdminPaymentNumbers() {
             </div>
             <div>
               <label className="text-sm font-medium">Opérateur</label>
-              <Input value={form.operatorName} onChange={(e) => setForm(f => ({ ...f, operatorName: e.target.value }))}
-                placeholder="Ex: Orange Money RDC, Airtel Money RDC" className="mt-1" data-testid="input-operator-name" />
+              <Select
+                value={form.operatorName}
+                onValueChange={(operatorName) => setForm(f => ({ ...f, operatorName }))}
+              >
+                <SelectTrigger
+                  className="mt-1"
+                  disabled={countriesLoading || configuredOperators.length === 0}
+                  data-testid="select-operator-name"
+                >
+                  <SelectValue placeholder="Sélectionnez un opérateur" />
+                </SelectTrigger>
+                <SelectContent>
+                  {configuredOperators.map((operator) => (
+                    <SelectItem key={operator} value={operator}>
+                      {operator}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {countriesLoading ? (
+                <p className="mt-1 text-xs text-muted-foreground">Chargement des opérateurs RDC...</p>
+              ) : configuredOperators.length === 0 ? (
+                <p className="mt-1 text-xs text-destructive">
+                  Aucun opérateur RDC configuré. Ajoutez d'abord les opérateurs dans la configuration RDC.
+                </p>
+              ) : (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Sélectionnez un opérateur déjà configuré pour la RDC.
+                </p>
+              )}
             </div>
             <div>
               <label className="text-sm font-medium">Numéro de téléphone</label>
