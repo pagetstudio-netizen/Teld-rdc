@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   ChevronRight,
   CreditCard,
+  Gift,
   Info,
   Loader2,
   LockKeyhole,
@@ -70,6 +71,7 @@ export default function AccountPage() {
     { label: "Paramètres de mot de passe", icon: LockKeyhole, href: "/change-password", testId: "button-change-password" },
     { label: "Inviter d'autres", icon: UserRoundPlus, href: "/team", testId: "button-invite-team" },
     { label: "Informations de carte bancaire", icon: CreditCard, href: "/wallet", testId: "button-wallet" },
+    { label: "Code cadeau", icon: Gift, href: "/gift-code", testId: "button-gift-code" },
     { label: "À propos de nous", icon: Info, href: "/about", testId: "button-about" },
   ];
 
