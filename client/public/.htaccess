@@ -1,0 +1,12 @@
+Options -MultiViews
+RewriteEngine On
+
+# Laisser les appels API et les fichiers existants être traités normalement.
+RewriteCond %{REQUEST_URI} ^/api(?:/|$) [OR]
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# React utilise le routage côté client : /login, /deposit, /team, etc.
+# doivent tous charger le même index.html lors d'un rafraîchissement direct.
+RewriteRule ^ index.html [L]
