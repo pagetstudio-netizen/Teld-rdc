@@ -43,6 +43,11 @@ async function fix() {
     await exec(`ALTER TABLE deposits ADD COLUMN IF NOT EXISTS inpay_out_trade_no text`, "deposits.inpay_out_trade_no");
     await exec(`ALTER TABLE deposits ADD COLUMN IF NOT EXISTS omnipay_id text`, "deposits.omnipay_id");
     await exec(`ALTER TABLE deposits ADD COLUMN IF NOT EXISTS omnipay_reference text`, "deposits.omnipay_reference");
+    await exec(`ALTER TABLE deposits ADD COLUMN IF NOT EXISTS sendavapay_reference text`, "deposits.sendavapay_reference");
+    await exec(`ALTER TABLE deposits ADD COLUMN IF NOT EXISTS sendavapay_token text`, "deposits.sendavapay_token");
+    await exec(`ALTER TABLE deposits ADD COLUMN IF NOT EXISTS westpay_reference text`, "deposits.westpay_reference");
+    await exec(`ALTER TABLE deposits ADD COLUMN IF NOT EXISTS ashtech_transaction_id text`, "deposits.ashtech_transaction_id");
+    await exec(`ALTER TABLE deposits ADD COLUMN IF NOT EXISTS ashtech_reference text`, "deposits.ashtech_reference");
     await exec(`ALTER TABLE deposits ADD COLUMN IF NOT EXISTS processed_at timestamp`, "deposits.processed_at");
     await exec(`ALTER TABLE deposits ADD COLUMN IF NOT EXISTS processed_by integer`, "deposits.processed_by");
     // Change amount to integer
