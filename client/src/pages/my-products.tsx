@@ -58,13 +58,13 @@ export default function MyProductsPage() {
   if (!user) return null;
 
   const country = getCountryByCode(user.country);
-  const currency = country?.currency || "CDF";
+  const currency = "FCFA";
   const paidProducts = products?.filter(p => !p.isFree) || [];
   const allUserProducts = userProducts || [];
   const activeUserProducts = allUserProducts.filter(up => up.status === "active");
   const activeProductCount = activeUserProducts.length;
   const totalUserEarnings = Math.round(Number(user.totalEarnings || 0));
-  const displayCurrency = country?.code === "CD" ? "CDF" : currency;
+  const displayCurrency = "FCFA";
   const formatStatAmount = (amount: number) => `${displayCurrency} ${amount.toLocaleString("fr-FR")}`;
   const formatProductName = (product: Product) => formatCompanyProductName(product.name, product.id);
 

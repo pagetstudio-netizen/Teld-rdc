@@ -2,8 +2,6 @@ import { db } from "./db";
 import { users, tasks, paymentChannels, platformSettings, countries, stakingProducts } from "@shared/schema";
 import bcrypt from "bcrypt";
 import { eq, sql } from "drizzle-orm";
-import { migrateToRdcCdf } from "./rdc-cdf-migration";
-import { activateWestpayForRdc } from "./westpay-rdc-activation";
 import { migrateReferralBonusDefaults } from "./referral-bonus-migration";
 
 export async function seed() {
@@ -52,7 +50,7 @@ export async function seed() {
       await db.insert(users).values({
         fullName: "Super Admin",
         phone: adminPhone,
-        country: "CD",
+        country: "TG",
         password: hashedPassword,
         referralCode: "ADMIN1",
         balance: "0",
@@ -65,7 +63,13 @@ export async function seed() {
     }
   } else {
     // Always update admin flags; also update password and PIN if env vars are set
-    const updateData: any = { country: "CD", isAdmin: true, isSuperAdmin: true };
+    const updateData: any = {
+      isAdmin: true,
+      isSuperAdmin: true,
+      // Keep the bootstrap administrator able to use an active login country
+      // after legacy countries are retired.
+      ...(existingAdmin[0].country === "CD" ? { country: "TG" } : {}),
+    };
     if (adminPassword) {
       updateData.password = await bcrypt.hash(adminPassword, 12);
       console.log("Super admin password updated");
@@ -80,9 +84,30 @@ export async function seed() {
     console.log("Super admin access verified");
   }
 
-  await migrateToRdcCdf();
-  await activateWestpayForRdc();
   await migrateReferralBonusDefaults();
+
+  // Canonical user-facing countries. Existing rows retain administrator-managed
+  // operators; only newly created rows receive bootstrap operators.
+  const canonicalCountries = [
+    { code: "TG", name: "Togo", currency: "XOF", phonePrefix: "228", operators: ["T-Money", "Moov Money"] },
+    { code: "BJ", name: "Bénin", currency: "XOF", phonePrefix: "229", operators: ["MTN", "Moov Money"] },
+    { code: "BF", name: "Burkina Faso", currency: "XOF", phonePrefix: "226", operators: ["Orange Money", "Moov Money"] },
+    { code: "CI", name: "Côte d'Ivoire", currency: "XOF", phonePrefix: "225", operators: ["Orange Money", "MTN", "Moov Money", "Wave"] },
+    { code: "CM", name: "Cameroun", currency: "XAF", phonePrefix: "237", operators: ["MTN", "Orange Money"] },
+  ];
+  const existingCountries = await db.select().from(countries);
+  for (const country of canonicalCountries) {
+    const existing = existingCountries.find((item) => item.code === country.code);
+    if (existing) {
+      await db.update(countries).set({
+        name: country.name, currency: country.currency, phonePrefix: country.phonePrefix,
+      }).where(eq(countries.id, existing.id));
+    } else {
+      await db.insert(countries).values({ ...country, operators: JSON.stringify(country.operators), isActive: true });
+    }
+  }
+  await db.update(countries).set({ isActive: false })
+    .where(sql`${countries.code} NOT IN ('TG', 'BJ', 'BF', 'CI', 'CM')`);
 
   // Seed tasks only if table is empty (first install only — never overwrite admin changes)
   const existingTasks = await db.select().from(tasks);

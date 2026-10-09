@@ -60,7 +60,7 @@ export default function InvestPage() {
 
   const balance     = parseFloat(user.balance || "0");
   const country     = getCountryByCode(user.country);
-  const currency    = country?.currency || "CDF";
+  const currency    = "FCFA";
   const paidProducts = products?.filter(p => !p.isFree) || [];
   const myProducts   = paidProducts.filter(p => p.isOwned);
   const displayed    = activeTab === "all" ? paidProducts : myProducts;

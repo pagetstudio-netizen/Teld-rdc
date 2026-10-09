@@ -49,7 +49,7 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
               ✔️ L'application de recharge et d'investissement la plus fiable !
             </p>
             <div className="space-y-[2px]">
-              <p>➤ Les nouveaux utilisateurs reçoivent {signupBonus} CDF à l'inscription.</p>
+              <p>➤ Les nouveaux utilisateurs reçoivent {signupBonus} FCFA à l'inscription.</p>
               <p>
                 ➤ Gagnez des commissions de {level1Commission} %, {level2Commission} % et{" "}
                 {level3Commission} % respectivement pour chaque ami parrainé.

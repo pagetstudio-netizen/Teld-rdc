@@ -34,7 +34,7 @@ export default function WithdrawalPage() {
   const [selectedWallet, setSelectedWallet] = useState<WalletData | null>(null);
 
   const countryInfo = user ? getCountryByCode(user.country) : null;
-  const currency = countryInfo?.currency || "CDF";
+  const currency = "FCFA";
 
   const { data: withdrawalSettings } = useQuery<{
     withdrawalFees: number;
@@ -393,11 +393,11 @@ export default function WithdrawalPage() {
           <section className="balance-summary" aria-label="Solde actuel">
             <img className="balance-brand" src={teldLogo} alt="TELD (Tcharging)" />
             <p className="balance-label">Solde actuel</p>
-            <p className="balance-value" data-testid="text-balance">CDF {Math.round(balance).toLocaleString("fr-FR")}</p>
+            <p className="balance-value" data-testid="text-balance">FCFA {Math.round(balance).toLocaleString("fr-FR")}</p>
           </section>
 
           <section className="wallet-section" aria-label="Compte mobile">
-            <p className="field-label">Sélectionnez votre compte mobile RDC</p>
+            <p className="field-label">Sélectionnez votre compte mobile</p>
             <button
               type="button"
               className="wallet-field"
@@ -415,7 +415,7 @@ export default function WithdrawalPage() {
           <section className="amount-section" aria-label="Montant du retrait">
             <p className="field-label">Montant du retrait</p>
             <label className="amount-field">
-              <span className="amount-currency">CDF</span>
+              <span className="amount-currency">FCFA</span>
               <input
                 type="number"
                 inputMode="numeric"
@@ -427,7 +427,7 @@ export default function WithdrawalPage() {
               />
             </label>
             <div className="amount-details">
-              <span>Montant reçu : CDF {amountAfterFees.toLocaleString("fr-FR")}</span>
+              <span>Montant reçu : FCFA {amountAfterFees.toLocaleString("fr-FR")}</span>
               <span>Taux de frais : {withdrawalFee}%</span>
             </div>
           </section>
@@ -443,7 +443,7 @@ export default function WithdrawalPage() {
           </button>
 
           <section className="instructions" aria-label="Instructions de retrait">
-            <p>1. Montant minimum de retrait : {minWithdrawal.toLocaleString("fr-FR")} CDF.</p>
+            <p>1. Montant minimum de retrait : {minWithdrawal.toLocaleString("fr-FR")} FCFA.</p>
             <p>2. Les frais de retrait s'élèvent à {withdrawalFee} % du montant retiré.</p>
             <p>3. Vous pouvez effectuer des retraits à tout moment. Les retraits sont disponibles sous 4 à 24 heures.</p>
             <p>4. Afin de protéger les intérêts de la plateforme et de ses membres, vous devez disposer d'au moins un appareil pour activer la fonction de retrait.</p>

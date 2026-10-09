@@ -97,7 +97,7 @@ export default function DepositModal({ open, onClose }: DepositModalProps) {
       setSelectedAmount(amount);
       setStep("details");
     } else {
-      toast({ title: "Montant invalide", description: "Le montant minimum est indiqué en CDF", variant: "destructive" });
+      toast({ title: "Montant invalide", description: "Le montant minimum est indiqué en FCFA", variant: "destructive" });
     }
   };
 

@@ -37,7 +37,7 @@ export default function CheckinPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/daily-bonus-status"] });
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      toast({ title: "Bonus reçu !", description: "204 CDF ajoutés à votre solde" });
+      toast({ title: "Bonus reçu !", description: "204 FCFA ajoutés à votre solde" });
     },
     onError: (error: Error) => {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
@@ -47,7 +47,7 @@ export default function CheckinPage() {
   if (!user) return null;
 
   const country = getCountryByCode(user.country);
-  const currency = country?.currency || "CDF";
+  const currency = "FCFA";
   const totalBonusClaimed = bonusStatus?.totalBonusClaimed || 0;
   const canClaim = Boolean(bonusStatus?.canClaim);
   const formatAmount = (amount: number) => `${Math.round(amount).toLocaleString("fr-FR")}${currency}`;

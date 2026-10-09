@@ -130,7 +130,7 @@ export default function AdminGiftCodes() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="amount">Montant (CDF)</Label>
+                <Label htmlFor="amount">Montant (FCFA)</Label>
                 <Input
                   id="amount"
                   type="number"
@@ -198,7 +198,7 @@ export default function AdminGiftCodes() {
               <CardContent className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Montant</span>
-                  <span className="font-semibold" data-testid={`text-amount-${giftCode.id}`}>{parseFloat(giftCode.amount).toLocaleString()} CDF</span>
+                  <span className="font-semibold" data-testid={`text-amount-${giftCode.id}`}>{parseFloat(giftCode.amount).toLocaleString()} FCFA</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Utilisations</span>

@@ -86,7 +86,7 @@ export default function AdminTeamPage() {
             <div>
               <p className="text-xs text-muted-foreground">Total investi</p>
               <p className="text-xl font-bold text-primary">
-                {member.totalInvested.toLocaleString()} CDF
+                {member.totalInvested.toLocaleString()} FCFA
               </p>
             </div>
           </div>
@@ -100,7 +100,7 @@ export default function AdminTeamPage() {
                 <div key={i} className="flex items-center justify-between text-sm bg-secondary rounded-lg px-3 py-2">
                   <span>{p.productName}</span>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">{p.productPrice.toLocaleString()} CDF</span>
+                    <span className="font-medium">{p.productPrice.toLocaleString()} FCFA</span>
                     <Badge variant={p.isActive ? "default" : "secondary"} className="text-xs">
                       {p.isActive ? "Actif" : "Terminé"}
                     </Badge>
@@ -135,7 +135,7 @@ export default function AdminTeamPage() {
           </div>
           <div className="text-right">
             <p className="text-xs text-muted-foreground">Total investi</p>
-            <p className="text-xl font-bold text-primary">{total.toLocaleString()} CDF</p>
+            <p className="text-xl font-bold text-primary">{total.toLocaleString()} FCFA</p>
           </div>
         </div>
       </CardContent>
@@ -185,7 +185,7 @@ export default function AdminTeamPage() {
                 <div className="mt-4 pt-4 border-t text-center">
                   <p className="text-xs text-muted-foreground">Total investi par l'equipe</p>
                   <p className="text-2xl font-bold text-primary">
-                    {(teamData.totalLevel1Invested + teamData.totalLevel2Invested + teamData.totalLevel3Invested).toLocaleString()} CDF
+                    {(teamData.totalLevel1Invested + teamData.totalLevel2Invested + teamData.totalLevel3Invested).toLocaleString()} FCFA
                   </p>
                 </div>
               </CardContent>

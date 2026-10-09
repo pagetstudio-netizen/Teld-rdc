@@ -343,17 +343,21 @@ export const phoneNumberSchema = z.string()
   .trim()
   .regex(/^\+?[0-9]{8,15}$/, "Numéro de téléphone invalide");
 
+export const supportedCountryCodeSchema = z.enum(["TG", "BJ", "BF", "CI", "CM"], {
+  errorMap: () => ({ message: "Pays non pris en charge" }),
+});
+
 export const registerSchema = z.object({
   fullName: z.string().trim().min(2, "Le nom complet est requis").max(100, "Nom trop long"),
   phone: phoneNumberSchema,
-  country: z.literal("CD", { errorMap: () => ({ message: "La plateforme est disponible uniquement en RDC" }) }),
+  country: supportedCountryCodeSchema,
   password: z.string().min(6, "Le mot de passe doit avoir au moins 6 caractères"),
   invitationCode: z.string().optional(),
 });
 
 export const loginSchema = z.object({
   phone: phoneNumberSchema,
-  country: z.literal("CD", { errorMap: () => ({ message: "La plateforme est disponible uniquement en RDC" }) }),
+  country: supportedCountryCodeSchema,
   password: z.string().min(1, "Le mot de passe est requis"),
 });
 
@@ -361,7 +365,7 @@ export const depositSchema = z.object({
   amount: z.number().min(1, "Le montant doit être positif"),
   accountName: z.string().trim().min(2, "Le nom du compte est requis").max(100, "Nom trop long"),
   accountNumber: phoneNumberSchema,
-  country: z.literal("CD", { errorMap: () => ({ message: "Les dépôts sont disponibles uniquement en RDC" }) }),
+  country: supportedCountryCodeSchema,
   paymentMethod: z.string().trim().min(2, "Le moyen de paiement est requis").max(60, "Moyen de paiement invalide"),
   paymentChannelId: z.number().optional(),
 });
@@ -374,7 +378,7 @@ export const walletSchema = z.object({
   accountName: z.string().trim().min(2, "Le nom du compte est requis").max(100, "Nom trop long"),
   accountNumber: phoneNumberSchema,
   paymentMethod: z.string().trim().min(2, "Le moyen de paiement est requis").max(60, "Moyen de paiement invalide"),
-  country: z.literal("CD", { errorMap: () => ({ message: "Les portefeuilles doivent être enregistrés pour la RDC" }) }),
+  country: supportedCountryCodeSchema,
 });
 
 export const giftCodeSchema = z.object({

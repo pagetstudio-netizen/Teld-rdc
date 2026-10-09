@@ -48,7 +48,7 @@ export default function RegisterPage() {
     resolver: zodResolver(registerSchema),
     defaultValues: {
       phone: "",
-      country: "CD",
+      country: "TG",
       password: "",
       confirmPassword: "",
       invitationCode: refCode,
@@ -99,7 +99,7 @@ export default function RegisterPage() {
     }
   }
 
-  const displayedPrefix = countryData?.phonePrefix || "243";
+  const displayedPrefix = countryData?.phonePrefix || "228";
 
   return (
     <AuthLayout mode="register">

@@ -29,7 +29,7 @@ function formatDate(iso: string) {
 export default function WithdrawalHistoryPage() {
   const { user } = useAuth();
   const countryInfo = user ? getCountryByCode(user.country) : null;
-  const currency = countryInfo?.currency || "CDF";
+  const currency = "FCFA";
 
   const { data: withdrawals = [], isLoading } = useQuery<Withdrawal[]>({
     queryKey: ["/api/withdrawals/history"],

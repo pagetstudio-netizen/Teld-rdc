@@ -105,7 +105,7 @@ export default function AdminSettings({ isSuperAdmin }: AdminSettingsProps) {
       sendavapayChannelName: "SendavaPay",
       westpayEnabled: true,
       westpayChannelName: "WestPay",
-      westpayCountries: "CD",
+      westpayCountries: "TG,BJ,BF,CI,CM",
     },
   });
 
@@ -143,7 +143,7 @@ export default function AdminSettings({ isSuperAdmin }: AdminSettingsProps) {
         sendavapayChannelName: settings.sendavapayChannelName || "SendavaPay",
         westpayEnabled: settings.westpayEnabled === "true",
         westpayChannelName: settings.westpayChannelName || "WestPay",
-        westpayCountries: settings.westpayCountries || "CD",
+        westpayCountries: settings.westpayCountries || "TG,BJ,BF,CI,CM",
       });
     }
   }, [settings, form]);
@@ -415,7 +415,7 @@ export default function AdminSettings({ isSuperAdmin }: AdminSettingsProps) {
           <CardContent className="space-y-4">
             <FormField control={form.control} name="signupBonus" render={({ field }) => (
               <FormItem>
-                <FormLabel>Bonus d'inscription (CDF)</FormLabel>
+                <FormLabel>Bonus d'inscription (FCFA)</FormLabel>
                 <FormControl><Input {...field} type="number" min="0" /></FormControl>
                 <FormDescription>Montant offert à chaque nouvel utilisateur à l'inscription.</FormDescription>
                 <FormMessage />
@@ -425,14 +425,14 @@ export default function AdminSettings({ isSuperAdmin }: AdminSettingsProps) {
             <div className="grid grid-cols-2 gap-4">
               <FormField control={form.control} name="minDeposit" render={({ field }) => (
                 <FormItem>
-                <FormLabel>Dépôt minimum (CDF)</FormLabel>
+                <FormLabel>Dépôt minimum (FCFA)</FormLabel>
                   <FormControl><Input {...field} type="number" min="0" /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
               <FormField control={form.control} name="minWithdrawal" render={({ field }) => (
                 <FormItem>
-                <FormLabel>Retrait minimum (CDF)</FormLabel>
+                <FormLabel>Retrait minimum (FCFA)</FormLabel>
                   <FormControl><Input {...field} type="number" min="0" /></FormControl>
                   <FormMessage />
                 </FormItem>
@@ -490,7 +490,7 @@ export default function AdminSettings({ isSuperAdmin }: AdminSettingsProps) {
                 <div>
                   <p className="text-sm font-semibold text-gray-800">SendavaPay</p>
                   <p className="text-xs text-gray-500">
-                    Paiement automatique Mobile Money pour les utilisateurs RDC
+                    Paiement automatique Mobile Money pour les pays activés
                   </p>
                 </div>
                 <FormField control={form.control} name="sendavapayEnabled" render={({ field }) => (
@@ -513,7 +513,7 @@ export default function AdminSettings({ isSuperAdmin }: AdminSettingsProps) {
               )} />
               <div className="rounded-xl bg-orange-50 border border-orange-100 p-3 text-xs text-orange-700 space-y-1">
                 <p className="font-semibold">Configuration SendavaPay</p>
-                <p>Pays configuré : <strong>RDC (CD)</strong></p>
+                <p>Pays configurés : <strong>TG, BJ, BF, CI, CM</strong></p>
                 <p>Ajoutez <code className="bg-orange-100 px-1 rounded">SENDAVAPAY_API_KEY</code> dans les Secrets du serveur.</p>
                 <p>Le secret webhook doit rester dans <code className="bg-orange-100 px-1 rounded">SENDAVAPAY_WEBHOOK_SECRET</code>.</p>
                 <p>Webhook : <code className="bg-orange-100 px-1 rounded">/api/webhooks/sendavapay</code></p>
@@ -550,9 +550,9 @@ export default function AdminSettings({ isSuperAdmin }: AdminSettingsProps) {
               <FormField control={form.control} name="westpayCountries" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Pays activés</FormLabel>
-                  <FormControl><Input {...field} placeholder="CD" /></FormControl>
+                  <FormControl><Input {...field} placeholder="TG,BJ,BF,CI,CM" /></FormControl>
                   <FormDescription className="text-xs">
-                    Pour la plateforme RDC, utilisez le code <strong>CD</strong>. Laissez vide pour tous les pays pris en charge.
+                    Utilisez les codes <strong>TG,BJ,BF,CI,CM</strong>. Laissez vide pour tous les pays pris en charge.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

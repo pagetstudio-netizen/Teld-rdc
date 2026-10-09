@@ -171,7 +171,7 @@ export default function AdminDeposits() {
                   <div className="grid grid-cols-2 gap-2 text-sm bg-secondary/50 rounded-xl p-3">
                     <div>
                       <p className="text-muted-foreground text-xs">Montant</p>
-                      <p className="font-bold text-lg text-primary">{deposit.amount.toLocaleString()} CDF</p>
+                      <p className="font-bold text-lg text-primary">{deposit.amount.toLocaleString()} FCFA</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground text-xs">Opérateur</p>

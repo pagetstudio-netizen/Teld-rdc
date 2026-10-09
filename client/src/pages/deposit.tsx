@@ -98,7 +98,7 @@ export default function DepositPage() {
   const countryInfo = apiCountries.length > 0
     ? apiCountries.find(c => c.code === country && c.isActive)
     : COUNTRIES.find(c => c.code === country);
-  const currency = countryInfo?.currency || "CDF";
+  const currency = countryInfo ? "FCFA" : "FCFA";
 
   const { data: platformSettings, isLoading: platformSettingsLoading } = useQuery<Record<string, string>>({
     queryKey: ["/api/settings"],
@@ -844,7 +844,7 @@ export default function DepositPage() {
 
           <p className="custom-label">Saisissez un autre montant</p>
           <label className="amount-input">
-            <span className="currency">CDF</span>
+            <span className="currency">FCFA</span>
             <input
               type="number"
               inputMode="numeric"
@@ -856,8 +856,8 @@ export default function DepositPage() {
           </label>
 
           <p className="method-label">Méthode de dépôt</p>
-          <button type="button" className="deposit-method" aria-label="Méthode Dépôt CDF">
-            <span className="method-copy"><span className="method-icon" aria-hidden="true" />Dépôt CDF</span>
+          <button type="button" className="deposit-method" aria-label="Méthode Dépôt FCFA">
+            <span className="method-copy"><span className="method-icon" aria-hidden="true" />Dépôt FCFA</span>
             <span className="method-check" aria-hidden="true">✓</span>
           </button>
 
@@ -875,7 +875,7 @@ export default function DepositPage() {
           </Link>
 
           <div className="deposit-instructions" aria-label="Instructions de dépôt">
-            <p>1. Le montant minimum de recharge est de {MIN_DEPOSIT.toLocaleString("fr-FR")} CDF.</p>
+            <p>1. Le montant minimum de recharge est de {MIN_DEPOSIT.toLocaleString("fr-FR")} FCFA.</p>
             <p>2. Vérifiez attentivement vos informations de paiement avant de confirmer.</p>
           </div>
         </section>
@@ -883,29 +883,29 @@ export default function DepositPage() {
     </main>
   );
 
-  // ── STEP 2: Select an active RDC payment number ───────────────────────────
+  // ── STEP 2: Select an active payment number ───────────────────────────────
   if (step === "select") return (
     <div className="min-h-screen bg-white">
       <header className="flex items-center justify-between border-b border-gray-100 bg-white px-4 py-4">
         <button className="flex items-center gap-1 text-gray-800" onClick={() => setStep("amount")}>
-          <ChevronLeft className="h-5 w-5" /><span className="font-semibold text-base">Numéro de paiement RDC</span>
+          <ChevronLeft className="h-5 w-5" /><span className="font-semibold text-base">Numéro de paiement</span>
         </button>
         <Link href="/history"><button className="rounded-full border border-[#00CC2C] px-3 py-1.5 text-xs font-semibold text-[#00CC2C]">Historique</button></Link>
       </header>
       <div className="mx-4 mt-4 flex items-center justify-between rounded-xl border border-orange-100 bg-orange-50 p-4">
-        <div><p className="text-xs text-gray-500">Montant à déposer</p><p className="text-xl font-bold text-[#00CC2C]">{Number(amount).toLocaleString()} CDF</p></div>
+        <div><p className="text-xs text-gray-500">Montant à déposer</p><p className="text-xl font-bold text-[#00CC2C]">{Number(amount).toLocaleString()} FCFA</p></div>
         <button onClick={() => setStep("amount")} className="text-xs text-[#00CC2C] underline">Modifier</button>
       </div>
       <div className="p-4 space-y-3">
         <div className="rounded-2xl border-2 border-[#00CC2C] bg-green-50 p-4">
           <p className="text-sm font-bold text-gray-900">Choisissez le compte mobile destinataire</p>
-          <p className="mt-1 text-xs text-gray-600">Effectuez ensuite le transfert depuis Orange Money RDC, Airtel Money RDC ou un opérateur RDC configuré.</p>
+          <p className="mt-1 text-xs text-gray-600">Effectuez ensuite le transfert depuis l'opérateur configuré pour votre pays.</p>
         </div>
         {numbersLoading ? (
           <Loader2 className="mx-auto my-8 h-7 w-7 animate-spin text-[#00CC2C]" />
         ) : paymentNumbersList.length === 0 ? (
           <div className="rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800">
-            Aucun numéro de paiement RDC n'est disponible pour le moment. Contactez le service client.
+            Aucun numéro de paiement n'est disponible pour le moment. Contactez le service client.
           </div>
         ) : (
           paymentNumbersList.map((number) => (

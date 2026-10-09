@@ -214,8 +214,8 @@ export default function HomePage() {
       `}</style>
 
       <div className="teld-dashboard-reference__screen">
-        <section className="teld-dashboard-reference__hero" aria-label="TELD, un nouveau monde en RDC">
-          <img src={dashboardBanner} alt="TELD, un nouveau monde en RDC pour votre succès" />
+        <section className="teld-dashboard-reference__hero" aria-label="TELD, un nouveau monde pour votre succès">
+          <img src={dashboardBanner} alt="TELD, un nouveau monde pour votre succès" />
         </section>
 
         <section className="teld-dashboard-reference__announcement" aria-label="Annonce de recharges">
@@ -235,7 +235,7 @@ export default function HomePage() {
             </div>
             <div className="teld-dashboard-reference__metric-copy">
               <span className="teld-dashboard-reference__metric-label">Solde</span>
-              <strong className="teld-dashboard-reference__metric-value"><small>CDF </small>{formatAmount(balance)}</strong>
+              <strong className="teld-dashboard-reference__metric-value"><small>FCFA </small>{formatAmount(balance)}</strong>
             </div>
           </article>
 
@@ -245,7 +245,7 @@ export default function HomePage() {
             </div>
             <div className="teld-dashboard-reference__metric-copy">
               <span className="teld-dashboard-reference__metric-label">Cumulatif</span>
-              <strong className="teld-dashboard-reference__metric-value"><small>CDF </small>{formatAmount(cumulative)}</strong>
+              <strong className="teld-dashboard-reference__metric-value"><small>FCFA </small>{formatAmount(cumulative)}</strong>
             </div>
           </article>
         </section>

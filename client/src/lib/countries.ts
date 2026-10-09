@@ -1,10 +1,18 @@
 // Fallback country data (used if API not available)
 export const COUNTRIES = [
-  { code: "CD", name: "République démocratique du Congo", flag: "CD", currency: "CDF", paymentMethods: ["Orange Money RDC", "Airtel Money RDC"] },
+  { code: "TG", name: "Togo", flag: "TG", currency: "XOF", paymentMethods: ["T-Money", "Moov Money"] },
+  { code: "BJ", name: "Bénin", flag: "BJ", currency: "XOF", paymentMethods: ["MTN", "Moov Money"] },
+  { code: "BF", name: "Burkina Faso", flag: "BF", currency: "XOF", paymentMethods: ["Orange Money", "Moov Money"] },
+  { code: "CI", name: "Côte d'Ivoire", flag: "CI", currency: "XOF", paymentMethods: ["Orange Money", "MTN", "Moov Money", "Wave"] },
+  { code: "CM", name: "Cameroun", flag: "CM", currency: "XAF", paymentMethods: ["MTN", "Orange Money"] },
 ];
 
 export const FALLBACK_COUNTRIES = [
-  { code: "CD", name: "République démocratique du Congo", currency: "CDF", phonePrefix: "243", operators: ["Orange Money RDC", "Airtel Money RDC"] },
+  { code: "TG", name: "Togo", currency: "XOF", phonePrefix: "228", operators: ["T-Money", "Moov Money"] },
+  { code: "BJ", name: "Bénin", currency: "XOF", phonePrefix: "229", operators: ["MTN", "Moov Money"] },
+  { code: "BF", name: "Burkina Faso", currency: "XOF", phonePrefix: "226", operators: ["Orange Money", "Moov Money"] },
+  { code: "CI", name: "Côte d'Ivoire", currency: "XOF", phonePrefix: "225", operators: ["Orange Money", "MTN", "Moov Money", "Wave"] },
+  { code: "CM", name: "Cameroun", currency: "XAF", phonePrefix: "237", operators: ["MTN", "Orange Money"] },
 ];
 
 // Legacy compatibility - kept for places still using ELIGIBLE_COUNTRIES directly
@@ -68,6 +76,5 @@ export function getPaymentMethodsForCountry(code: string, apiCountries?: ApiCoun
 
 export function formatCurrency(amount: number, countryCode: string, apiCountries?: ApiCountry[]): string {
   const country = getCountryByCode(countryCode, apiCountries);
-  const currency = country?.currency || "CDF";
-  return `${amount.toLocaleString()} ${currency}`;
+  return `${amount.toLocaleString()} FCFA`;
 }

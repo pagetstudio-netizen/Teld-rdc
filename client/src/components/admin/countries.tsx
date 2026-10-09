@@ -22,10 +22,10 @@ interface CountryForm {
 }
 
 const emptyForm: CountryForm = {
-  code: "CD",
-  name: "République démocratique du Congo",
-  currency: "CDF",
-  phonePrefix: "243",
+  code: "TG",
+  name: "Togo",
+  currency: "XOF",
+  phonePrefix: "228",
   operators: "",
   isActive: true,
 };
@@ -96,7 +96,7 @@ export default function AdminCountries() {
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <Globe className="w-5 h-5" />
-          Opérateurs RDC
+          Pays et opérateurs
         </h2>
       </div>
 
@@ -146,7 +146,7 @@ export default function AdminCountries() {
       <Dialog open={dialogOpen} onOpenChange={(v) => { if (!v) { setDialogOpen(false); setEditingId(null); setForm(emptyForm); }}}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Modifier les opérateurs RDC</DialogTitle>
+            <DialogTitle>Modifier le pays et ses opérateurs</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
@@ -154,7 +154,7 @@ export default function AdminCountries() {
                 <Label>Code pays (ex: TD)</Label>
                 <Input
                   value={form.code}
-                  placeholder="CD"
+                  placeholder="TG"
                   maxLength={3}
                   disabled
                   required
@@ -162,10 +162,10 @@ export default function AdminCountries() {
                 />
               </div>
               <div>
-                  <Label>Devise (CDF)</Label>
+                  <Label>Devise fournisseur (XOF/XAF)</Label>
                 <Input
                   value={form.currency}
-                  placeholder="CDF"
+                  placeholder="XOF"
                   maxLength={5}
                   disabled
                   data-testid="input-country-currency"
@@ -176,7 +176,7 @@ export default function AdminCountries() {
               <Label>Nom du pays</Label>
               <Input
                 value={form.name}
-                placeholder="République démocratique du Congo"
+                placeholder="Togo"
                 disabled
                 data-testid="input-country-name"
               />
@@ -185,7 +185,7 @@ export default function AdminCountries() {
               <Label>Indicatif téléphonique (sans +)</Label>
               <Input
                 value={form.phonePrefix}
-                placeholder="243"
+                placeholder="228"
                 disabled
                 data-testid="input-country-prefix"
               />
@@ -195,10 +195,10 @@ export default function AdminCountries() {
               <Input
                 value={form.operators}
                 onChange={e => setForm({ ...form, operators: e.target.value })}
-                placeholder="Orange Money RDC, Airtel Money RDC"
+                placeholder="T-Money, Moov Money"
                 data-testid="input-country-operators"
               />
-              <p className="text-xs text-muted-foreground mt-1">Ajoutez ici les opérateurs disponibles pour les comptes mobiles et numéros de paiement RDC.</p>
+              <p className="text-xs text-muted-foreground mt-1">Ces opérateurs contrôlent les comptes mobiles et numéros de paiement de ce pays.</p>
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => { setDialogOpen(false); setEditingId(null); setForm(emptyForm); }}>

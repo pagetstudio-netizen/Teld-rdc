@@ -79,7 +79,7 @@ export default function RobotPayPage() {
     (providerInfo && providerInfo.provider !== "manual" ? [{ provider: providerInfo.provider, name: providerInfo.name } as { provider: AutomaticProvider; name: string }] : []);
   const provider = manualMode ? "manual" : selectedAutomaticProvider || providerInfo?.provider || "manual";
   const countryInfo = getCountryByCode(country, countries);
-  const currency = countryInfo?.currency || "CDF";
+  const currency = "FCFA";
   const phonePrefix = countryInfo?.phonePrefix || "";
   const paymentPhone = phone.trim().startsWith("+")
     ? phone.trim()

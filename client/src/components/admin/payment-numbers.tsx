@@ -23,11 +23,10 @@ interface Country {
 }
 
 const COUNTRY_FLAGS: Record<string, string> = {
-  CM: "🇨🇲", BF: "🇧🇫", TG: "🇹🇬", BJ: "🇧🇯", CI: "🇨🇮", CG: "🇨🇬",
-  TD: "🇹🇩", NE: "🇳🇪", CD: "🇨🇩", CF: "🇨🇫",
+  CM: "🇨🇲", BF: "🇧🇫", TG: "🇹🇬", BJ: "🇧🇯", CI: "🇨🇮",
 };
 
-const emptyForm = { ownerName: "", phone: "", operatorName: "", country: "CD", logoUrl: "", isActive: true };
+const emptyForm = { ownerName: "", phone: "", operatorName: "", country: "TG", logoUrl: "", isActive: true };
 
 export default function AdminPaymentNumbers() {
   const { toast } = useToast();
@@ -45,11 +44,11 @@ export default function AdminPaymentNumbers() {
     queryKey: ["/api/countries"],
   });
 
-  const rdcCountry = countries.find((country) => country.code.toUpperCase() === "CD");
+  const selectedCountry = countries.find((country) => country.code === form.country);
   const configuredOperators = (() => {
-    if (!rdcCountry?.operators) return [];
+    if (!selectedCountry?.operators) return [];
     try {
-      const parsed = JSON.parse(rdcCountry.operators);
+      const parsed = JSON.parse(selectedCountry.operators);
       return Array.isArray(parsed)
         ? parsed
           .map((operator) => String(operator).trim())
@@ -165,8 +164,8 @@ export default function AdminPaymentNumbers() {
       ) : numbers.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
           <Phone className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p>Aucun numéro RDC configuré</p>
-          <p className="text-xs mt-1">Ajoutez des numéros Orange, Airtel ou d'un opérateur RDC configuré.</p>
+          <p>Aucun numéro configuré</p>
+          <p className="text-xs mt-1">Ajoutez un numéro pour un opérateur configuré.</p>
         </div>
       ) : (
         Object.entries(grouped).map(([country, nums]) => (
@@ -232,7 +231,12 @@ export default function AdminPaymentNumbers() {
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium">Pays</label>
-              <p className="mt-1 rounded-lg border border-border px-3 py-2 text-sm">🇨🇩 République démocratique du Congo (CD)</p>
+              <Select value={form.country} onValueChange={(country) => setForm(f => ({ ...f, country, operatorName: "" }))}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Sélectionnez un pays" /></SelectTrigger>
+                <SelectContent>
+                  {countries.filter(c => c.isActive).map(c => <SelectItem key={c.code} value={c.code}>{COUNTRY_FLAGS[c.code] || "🌍"} {c.name} ({c.code})</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="text-sm font-medium">Opérateur</label>
@@ -256,21 +260,21 @@ export default function AdminPaymentNumbers() {
                 </SelectContent>
               </Select>
               {countriesLoading ? (
-                <p className="mt-1 text-xs text-muted-foreground">Chargement des opérateurs RDC...</p>
+                <p className="mt-1 text-xs text-muted-foreground">Chargement des opérateurs...</p>
               ) : configuredOperators.length === 0 ? (
                 <p className="mt-1 text-xs text-destructive">
-                  Aucun opérateur RDC configuré. Ajoutez d'abord les opérateurs dans la configuration RDC.
+                  Aucun opérateur configuré. Ajoutez d'abord les opérateurs dans la configuration du pays.
                 </p>
               ) : (
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Sélectionnez un opérateur déjà configuré pour la RDC.
+                  Sélectionnez un opérateur déjà configuré pour ce pays.
                 </p>
               )}
             </div>
             <div>
               <label className="text-sm font-medium">Numéro de téléphone</label>
               <Input value={form.phone} onChange={(e) => setForm(f => ({ ...f, phone: e.target.value }))}
-                placeholder="Ex: +243990000000" className="mt-1" data-testid="input-phone" />
+                placeholder="Ex: +22890000000" className="mt-1" data-testid="input-phone" />
             </div>
             <div>
               <label className="text-sm font-medium">Nom du propriétaire</label>

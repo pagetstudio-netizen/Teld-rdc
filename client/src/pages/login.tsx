@@ -31,7 +31,7 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
     defaultValues: {
       phone: "",
-      country: "CD",
+      country: "TG",
       password: "",
     },
   });
@@ -81,7 +81,7 @@ export default function LoginPage() {
     }
   }
 
-  const displayedPrefix = countryData?.phonePrefix || "243";
+  const displayedPrefix = countryData?.phonePrefix || "228";
 
   return (
     <AuthLayout mode="login" showLanguage>

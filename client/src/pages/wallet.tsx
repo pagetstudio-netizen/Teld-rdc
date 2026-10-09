@@ -145,7 +145,7 @@ export default function WalletPage() {
             <ChevronLeft className="w-5 h-5 text-white" />
           </button>
           <h1 className="flex-1 text-center text-white font-bold text-base mr-9">
-            Ajouter un compte mobile RDC
+            Ajouter un compte mobile
           </h1>
         </div>
 

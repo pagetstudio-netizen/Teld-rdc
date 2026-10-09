@@ -115,10 +115,10 @@ export default function OrdersPage() {
                       
                       <div className="space-y-0.5 text-[12px]">
                         <p className="text-gray-600">
-                          Prix : <span className="text-orange-500 font-medium">{up.product?.price?.toLocaleString() || 0} CDF</span>
+                          Prix : <span className="text-orange-500 font-medium">{up.product?.price?.toLocaleString() || 0} FCFA</span>
                         </p>
                         <p className="text-gray-600">
-                          Gains/jour : <span className="text-green-500 font-medium">{up.product?.dailyEarnings?.toLocaleString() || 0} CDF</span>
+                          Gains/jour : <span className="text-green-500 font-medium">{up.product?.dailyEarnings?.toLocaleString() || 0} FCFA</span>
                         </p>
                         <p className="text-gray-600">
                           Duree : <span className="text-orange-500 font-medium">{up.product?.cycleDays || 0} Jours</span>
@@ -127,7 +127,7 @@ export default function OrdersPage() {
                           Jours restants : <span className="text-[#2196F3] font-medium">{up.daysRemaining || 0}</span>
                         </p>
                         <p className="text-gray-600">
-                          Total gagne : <span className="text-green-600 font-bold">{totalEarned.toLocaleString()} CDF</span>
+                          Total gagne : <span className="text-green-600 font-bold">{totalEarned.toLocaleString()} FCFA</span>
                         </p>
                         <p className="text-gray-600">
                           Date : <span className="text-gray-700 font-medium">{purchaseDate}</span> a <span className="text-gray-700 font-medium">{purchaseTime}</span>

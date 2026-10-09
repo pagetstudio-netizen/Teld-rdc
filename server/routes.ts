@@ -137,7 +137,7 @@ async function creditApprovedDeposit(deposit: { id: number; userId: number; amou
     [
       "✅ <b>Dépôt validé</b>",
       `Utilisateur : ${formatTelegramValue(user.fullName)}`,
-      `Montant : <b>${formatTelegramValue(deposit.amount)} CDF</b>`,
+      `Montant : <b>${formatTelegramValue(deposit.amount)} FCFA</b>`,
       `Référence : ${formatTelegramValue(deposit.id)}`,
       `Pays : ${formatTelegramValue(user.country)}`,
     ].join("\n"),
@@ -178,6 +178,7 @@ const PUBLIC_SETTING_KEYS = new Set([
   "level1Commission", "level2Commission", "level3Commission",
   "sendavapayEnabled", "sendavapayChannelName",
   "westpayEnabled", "westpayChannelName", "westpayCountries",
+  "ashtechEnabled", "ashtechChannelName", "ashtechCountries",
 ]);
 const ADMIN_SETTING_KEYS = new Set([
   ...Array.from(PUBLIC_SETTING_KEYS),
@@ -209,7 +210,7 @@ function validatePhone(value: unknown, fieldName: string): string {
   return result.data;
 }
 
-const RDC_COUNTRY_CODE = "CD";
+const SUPPORTED_COUNTRY_CODES = ["TG", "BJ", "BF", "CI", "CM"] as const;
 
 function parseCountryOperators(value: string): string[] {
   try {
@@ -222,16 +223,20 @@ function parseCountryOperators(value: string): string[] {
   }
 }
 
-async function getRdcOperators(): Promise<string[]> {
+async function getActiveCountry(code: unknown) {
+  if (typeof code !== "string") return undefined;
+  const normalizedCode = code.trim().toUpperCase();
+  if (!SUPPORTED_COUNTRY_CODES.includes(normalizedCode as typeof SUPPORTED_COUNTRY_CODES[number])) return undefined;
   const countries = await storage.getActiveCountries();
-  const rdc = countries.find((country) => country.code === RDC_COUNTRY_CODE);
-  return rdc ? parseCountryOperators(rdc.operators) : [];
+  return countries.find((country) => country.code === normalizedCode);
 }
 
-async function isRdcOperator(operator: unknown): Promise<boolean> {
+async function isActiveCountryOperator(countryCode: unknown, operator: unknown): Promise<boolean> {
   if (typeof operator !== "string") return false;
+  const country = await getActiveCountry(countryCode);
+  if (!country) return false;
   const normalized = operator.trim().toLocaleLowerCase();
-  return (await getRdcOperators()).some((item) => item.trim().toLocaleLowerCase() === normalized);
+  return parseCountryOperators(country.operators).some((item) => item.trim().toLocaleLowerCase() === normalized);
 }
 
 function requireAuth(req: Request, res: Response, next: NextFunction) {
@@ -304,26 +309,13 @@ export async function registerRoutes(
     }
   });
 
-  const automaticPaymentDisabled = (_req: Request, res: Response) =>
-    res.status(410).json({
-      message: "Les paiements automatiques ne sont pas disponibles en RDC. Utilisez un numéro de paiement RDC validé.",
-    });
-
-  [
-    "/api/soleaspay",
-    "/api/ashtechpay",
-    "/api/omnipay",
-    "/api/webhooks/ashtechpay",
-  ].forEach((path) => app.use(path, automaticPaymentDisabled));
-  [
-    "/api/deposits/:id/verify",
-    "/api/deposits/:id/ashtechpay-status",
-  ].forEach((path) => app.all(path, automaticPaymentDisabled));
-
   // Auth routes
   app.post("/api/auth/register", async (req, res) => {
     try {
       const data = registerSchema.parse(req.body);
+      if (!await getActiveCountry(data.country)) {
+        return res.status(400).json({ message: "Ce pays n'est pas actuellement disponible" });
+      }
       
       const existing = await storage.getUserByPhone(data.phone, data.country);
       if (existing) {
@@ -362,6 +354,9 @@ export async function registerRoutes(
     if (checkBruteForce(req, res)) return;
     try {
       const data = loginSchema.parse(req.body);
+      if (!await getActiveCountry(data.country)) {
+        return res.status(400).json({ message: "Ce pays n'est pas actuellement disponible" });
+      }
       
       let user = await storage.getUserByPhone(data.phone, data.country);
 
@@ -784,11 +779,11 @@ export async function registerRoutes(
   // Payment Numbers (public — filtered by country)
   app.get("/api/payment-numbers", requireAuth, async (req, res) => {
     try {
-      const country = String(req.query.country || RDC_COUNTRY_CODE).toUpperCase();
-      if (country !== RDC_COUNTRY_CODE) {
-        return res.status(400).json({ message: "Les paiements sont disponibles uniquement en RDC" });
+      const country = String(req.query.country || "").toUpperCase();
+      if (!await getActiveCountry(country)) {
+        return res.status(400).json({ message: "Pays indisponible" });
       }
-      res.json(await storage.getPaymentNumbersByCountry(RDC_COUNTRY_CODE));
+      res.json(await storage.getPaymentNumbersByCountry(country));
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -807,18 +802,19 @@ export async function registerRoutes(
   app.post("/api/admin/payment-numbers", requireAdmin, async (req, res) => {
     try {
       const { ownerName, phone, operatorName, country, logoUrl, isActive } = req.body;
-      if (!ownerName || !phone || !operatorName || String(country).toUpperCase() !== RDC_COUNTRY_CODE) {
+      const countryCode = String(country || "").trim().toUpperCase();
+      if (!ownerName || !phone || !operatorName || !await getActiveCountry(countryCode)) {
         return res.status(400).json({ message: "Tous les champs sont requis" });
       }
-      if (!await isRdcOperator(operatorName)) {
-        return res.status(400).json({ message: "Ajoutez d'abord cet opérateur à la configuration RDC" });
+      if (!await isActiveCountryOperator(countryCode, operatorName)) {
+        return res.status(400).json({ message: "Ajoutez d'abord cet opérateur à la configuration du pays" });
       }
       const normalizedPhone = validatePhone(phone, "Numéro");
       const num = await storage.createPaymentNumber({
         ownerName: String(ownerName).trim().slice(0, 100),
         phone: normalizedPhone,
         operatorName: String(operatorName).trim().slice(0, 60),
-        country: RDC_COUNTRY_CODE,
+        country: countryCode,
         logoUrl: logoUrl || null,
         isActive: isActive !== false,
         createdBy: req.session.userId,
@@ -833,17 +829,19 @@ export async function registerRoutes(
     try {
       const id = parseInt(getRouteParam(req, "id"));
       const { ownerName, phone, operatorName, country, logoUrl, isActive } = req.body;
-      if (country !== undefined && String(country).trim().toUpperCase() !== RDC_COUNTRY_CODE) {
-        return res.status(400).json({ message: "Les numéros de paiement doivent être enregistrés pour la RDC" });
+      const existing = await storage.getPaymentNumbers().then((items) => items.find((item) => item.id === id));
+      const countryCode = String(country ?? existing?.country ?? "").trim().toUpperCase();
+      if (!await getActiveCountry(countryCode)) {
+        return res.status(400).json({ message: "Pays indisponible" });
       }
-      if (operatorName !== undefined && !await isRdcOperator(operatorName)) {
-        return res.status(400).json({ message: "Ajoutez d'abord cet opérateur à la configuration RDC" });
+      if (operatorName !== undefined && !await isActiveCountryOperator(countryCode, operatorName)) {
+        return res.status(400).json({ message: "Ajoutez d'abord cet opérateur à la configuration du pays" });
       }
       const num = await storage.updatePaymentNumber(id, {
         ownerName: ownerName === undefined ? undefined : String(ownerName).trim().slice(0, 100),
         phone: phone === undefined ? undefined : validatePhone(phone, "Numéro"),
         operatorName: operatorName === undefined ? undefined : String(operatorName).trim().slice(0, 60),
-        country: country === undefined ? undefined : RDC_COUNTRY_CODE,
+        country: country === undefined ? undefined : countryCode,
         logoUrl, isActive,
       });
       res.json(num);
@@ -871,15 +869,16 @@ export async function registerRoutes(
       if (!user) {
         return res.status(401).json({ message: "Non authentifie" });
       }
-      if (user.country !== RDC_COUNTRY_CODE) {
-        return res.status(400).json({ message: "Les dépôts sont disponibles uniquement pour les comptes RDC" });
+      const activeUserCountry = await getActiveCountry(user.country);
+      if (!activeUserCountry) {
+        return res.status(400).json({ message: "Les dépôts ne sont pas disponibles pour ce pays" });
       }
 
       const settings = await storage.getSettings();
       const minDeposit = parseInt(settings.minDeposit || "3500");
        const requestedAmount = typeof amount === "number" ? amount : Number(amount);
        if (!Number.isFinite(requestedAmount) || requestedAmount < minDeposit) {
-        return res.status(400).json({ message: `Montant minimum: ${minDeposit.toLocaleString()} CDF` });
+        return res.status(400).json({ message: `Montant minimum: ${minDeposit.toLocaleString()} FCFA` });
       }
 
        const parsedDeposit = depositSchema.safeParse({
@@ -900,20 +899,20 @@ export async function registerRoutes(
          }
        }
        const normalizedDeposit = parsedDeposit.data;
-       if (normalizedDeposit.country !== RDC_COUNTRY_CODE || normalizedDeposit.country !== user.country) {
-         return res.status(400).json({ message: "Le dépôt doit être effectué pour la RDC" });
+       if (normalizedDeposit.country !== user.country || !await getActiveCountry(normalizedDeposit.country)) {
+         return res.status(400).json({ message: "Le dépôt doit être effectué pour le pays de votre compte" });
        }
        if (useSoleaspay) {
-         return res.status(400).json({ message: "Soleaspay n'est pas configuré pour la RDC. Utilisez WestPay." });
+          return res.status(400).json({ message: "Soleaspay n'est pas configuré pour ce pays. Utilisez un canal disponible." });
        }
-       if (!useWestpay) {
-         if (!await isRdcOperator(normalizedDeposit.paymentMethod)) {
-           return res.status(400).json({ message: "Cet opérateur n'est pas disponible en RDC" });
+        if (!useWestpay && !useSoleaspay) {
+          if (!await isActiveCountryOperator(normalizedDeposit.country, normalizedDeposit.paymentMethod)) {
+            return res.status(400).json({ message: "Cet opérateur n'est pas disponible dans ce pays" });
          }
          if (!paymentNumberId) {
-           return res.status(400).json({ message: "Sélectionnez un numéro de paiement RDC" });
+            return res.status(400).json({ message: "Sélectionnez un numéro de paiement" });
          }
-         const paymentNumbers = await storage.getPaymentNumbersByCountry(RDC_COUNTRY_CODE);
+          const paymentNumbers = await storage.getPaymentNumbersByCountry(normalizedDeposit.country);
          const selectedPaymentNumber = paymentNumbers.find((item) =>
            item.id === Number(paymentNumberId) &&
            item.operatorName.trim().toLocaleLowerCase() === normalizedDeposit.paymentMethod.trim().toLocaleLowerCase(),
@@ -991,8 +990,8 @@ export async function registerRoutes(
         .split(",")
         .map((code) => code.trim().toUpperCase())
         .filter(Boolean);
-      if (useWestpay && (!westpayEnabledDeposit || (westpayCountries.length > 0 && !westpayCountries.includes(RDC_COUNTRY_CODE)))) {
-        return res.status(400).json({ message: "WestPay n'est pas activé pour la RDC", westpay: true });
+       if (useWestpay && (!westpayEnabledDeposit || (westpayCountries.length > 0 && !westpayCountries.includes(normalizedDeposit.country)))) {
+         return res.status(400).json({ message: "WestPay n'est pas activé pour ce pays", westpay: true });
       }
       if (useWestpay && westpayEnabledDeposit) {
         try {
@@ -1130,10 +1129,16 @@ export async function registerRoutes(
   // ── AshtechPay Direct API ───────────────────────────────────────────────────
   app.get("/api/ashtechpay/countries", requireAuth, async (_req, res) => {
     try {
-      if (!isAshtechConfigured()) {
-        return res.status(503).json({ message: "AshtechPay non configuré" });
+      const settings = await storage.getSettings();
+      if (settings.ashtechEnabled !== "true" || !isAshtechConfigured()) {
+        return res.status(503).json({ message: "AshtechPay non activé ou non configuré" });
       }
-      res.json(await ashtechGetCountries());
+      const activeCodes = new Set((await storage.getActiveCountries()).map((country) => country.code.toUpperCase()));
+      const allowlist = (settings.ashtechCountries || "").split(",").map((code) => code.trim().toUpperCase()).filter(Boolean);
+      res.json((await ashtechGetCountries()).filter((country) =>
+        activeCodes.has(country.code.toUpperCase()) &&
+        (allowlist.length === 0 || allowlist.includes(country.code.toUpperCase())),
+      ));
     } catch (error: any) {
       console.error("[ashtechpay] countries error:", error);
       res.status(502).json({ message: error.message || "Impossible de charger les pays AshtechPay" });
@@ -1153,10 +1158,18 @@ export async function registerRoutes(
       const numericAmount = Number(amount);
       const minDeposit = parseInt(settings.minDeposit || "3000");
       if (!Number.isFinite(numericAmount) || numericAmount < minDeposit) {
-        return res.status(400).json({ message: `Montant minimum: ${minDeposit.toLocaleString()} CDF` });
+        return res.status(400).json({ message: `Montant minimum: ${minDeposit.toLocaleString()} FCFA` });
       }
       if (!country || !operator || !phone) {
         return res.status(400).json({ message: "Pays, opérateur et numéro requis" });
+      }
+      const activeCountry = await getActiveCountry(country);
+      if (!activeCountry || activeCountry.code !== user.country || !await isActiveCountryOperator(country, operator)) {
+        return res.status(400).json({ message: "Pays ou opérateur indisponible" });
+      }
+      const ashtechAllowlist = (settings.ashtechCountries || "").split(",").map((code) => code.trim().toUpperCase()).filter(Boolean);
+      if (ashtechAllowlist.length > 0 && !ashtechAllowlist.includes(activeCountry.code)) {
+        return res.status(400).json({ message: "AshtechPay n'est pas activé pour ce pays" });
       }
 
       const existingDeposit = depositId ? await storage.getDeposit(Number(depositId)) : undefined;
@@ -1175,7 +1188,7 @@ export async function registerRoutes(
       const notifyBaseUrl = process.env.PUBLIC_APP_URL || "https://Tonnew.top";
       const result = await ashtechCollect({
         amount: numericAmount,
-        currency: "CDF",
+        currency: activeCountry.currency,
         phone: String(phone).trim(),
         operator: String(operator).trim(),
         countryCode: String(country).trim().toUpperCase(),
@@ -1271,7 +1284,7 @@ export async function registerRoutes(
         [
           "❌ <b>Erreur de dépôt</b>",
           `Utilisateur : ${formatTelegramValue(errorUser?.fullName || "Inconnu")}`,
-          `Montant : <b>${formatTelegramValue(req.body?.amount)} CDF</b>`,
+          `Montant : <b>${formatTelegramValue(req.body?.amount)} FCFA</b>`,
           `Pays : ${formatTelegramValue(req.body?.country)}`,
           `Opérateur : ${formatTelegramValue(req.body?.operator)}`,
           `Erreur exacte : <code>${formatTelegramValue(message)}</code>`,
@@ -1332,7 +1345,15 @@ export async function registerRoutes(
   // Proxy: operators for a given country (public SendavaPay endpoint)
   app.get("/api/sendavapay/operators/:country", requireAuth, async (req, res) => {
     try {
-      const svCountry = toSendavapayCountry(getRouteParam(req, "country"));
+      const settings = await storage.getSettings();
+      if (settings.sendavapayEnabled !== "true") {
+        return res.status(503).json({ success: false, message: "SendavaPay non activé" });
+      }
+      const requestedCountry = getRouteParam(req, "country").toUpperCase();
+      if (!await getActiveCountry(requestedCountry)) {
+        return res.status(404).json({ success: false, message: "Pays indisponible" });
+      }
+      const svCountry = toSendavapayCountry(requestedCountry);
       const r = await fetch(
         `https://sendavapay.com/api/sdk/v1/operators/${svCountry}`
       );
@@ -1356,10 +1377,14 @@ export async function registerRoutes(
       }
       const minDeposit = parseInt(settings.minDeposit || "3000");
       if (!amount || amount < minDeposit) {
-        return res.status(400).json({ message: `Montant minimum: ${minDeposit.toLocaleString()} CDF` });
+        return res.status(400).json({ message: `Montant minimum: ${minDeposit.toLocaleString()} FCFA` });
       }
       if (!payerPhone || !payerPhone.trim()) {
         return res.status(400).json({ message: "Le numéro Mobile Money est requis" });
+      }
+      const activeCountry = await getActiveCountry(country);
+      if (!activeCountry || activeCountry.code !== user.country || !await isActiveCountryOperator(country, operatorName)) {
+        return res.status(400).json({ message: "Pays ou opérateur indisponible" });
       }
 
       const svCountry = toSendavapayCountry(country);
@@ -1422,6 +1447,10 @@ export async function registerRoutes(
       if (!payerPhone || !payerPhone.trim()) {
         return res.status(400).json({ message: "Le numéro Mobile Money est requis" });
       }
+      const deposit = depositId ? await storage.getDeposit(Number(depositId)) : undefined;
+      if (!deposit || deposit.userId !== user.id || !await getActiveCountry(payerCountry) || deposit.country !== String(payerCountry).toUpperCase()) {
+        return res.status(400).json({ message: "Paiement ou pays indisponible" });
+      }
 
       const svCountry = toSendavapayCountry(payerCountry);
       const customerPhone = sendavapayFormatPhone(payerPhone.trim(), payerCountry);
@@ -1467,6 +1496,10 @@ export async function registerRoutes(
       const { paymentToken, depositId } = req.body;
       if (!paymentToken) {
         return res.status(400).json({ message: "paymentToken requis" });
+      }
+      const deposit = depositId ? await storage.getDeposit(Number(depositId)) : undefined;
+      if (!deposit || deposit.userId !== req.session.userId || deposit.sendavapayToken !== paymentToken) {
+        return res.status(403).json({ message: "Paiement indisponible" });
       }
       // Reset deposit status to processing
       if (depositId) {
@@ -1708,7 +1741,7 @@ export async function registerRoutes(
       const settingsForWithdrawal = await storage.getSettings();
       const minWithdrawal = parseInt(settingsForWithdrawal.minWithdrawal || "6120");
       if (requestedAmount < minWithdrawal) {
-        return res.status(400).json({ message: `Montant minimum: ${minWithdrawal} CDF` });
+        return res.status(400).json({ message: `Montant minimum: ${minWithdrawal} FCFA` });
       }
 
       if (!user.hasActiveProduct) {
@@ -1738,8 +1771,8 @@ export async function registerRoutes(
       if (!wallet) {
         return res.status(400).json({ message: "Sélectionnez un portefeuille de retrait valide" });
       }
-      if (wallet.country !== RDC_COUNTRY_CODE || !await isRdcOperator(wallet.paymentMethod)) {
-        return res.status(400).json({ message: "Sélectionnez un compte Orange Money RDC, Airtel Money RDC ou un opérateur RDC actif" });
+      if (wallet.country !== user.country || !await isActiveCountryOperator(wallet.country, wallet.paymentMethod)) {
+        return res.status(400).json({ message: "Sélectionnez un portefeuille avec un opérateur actif dans votre pays" });
       }
 
       const todayCount = await storage.getUserWithdrawalCountToday(user.id);
@@ -1775,8 +1808,8 @@ export async function registerRoutes(
         [
           "💸 <b>Retrait lancé</b>",
           `Utilisateur : ${formatTelegramValue(user.fullName)}`,
-          `Montant : <b>${formatTelegramValue(requestedAmount)} CDF</b>`,
-          `Net après frais : ${formatTelegramValue(netAmount)} CDF`,
+          `Montant : <b>${formatTelegramValue(requestedAmount)} FCFA</b>`,
+          `Net après frais : ${formatTelegramValue(netAmount)} FCFA`,
           `Méthode : ${formatTelegramValue(wallet.paymentMethod)}`,
           `Pays : ${formatTelegramValue(wallet.country)}`,
           `ID retrait : ${formatTelegramValue(withdrawal.id)}`,
@@ -1815,11 +1848,11 @@ export async function registerRoutes(
         return res.status(400).json({ message: parsedWallet.error.errors[0]?.message || "Données invalides" });
       }
       const user = await storage.getUser(req.session.userId!);
-      if (!user || user.country !== RDC_COUNTRY_CODE || parsedWallet.data.country !== RDC_COUNTRY_CODE) {
-        return res.status(400).json({ message: "Les portefeuilles sont disponibles uniquement en RDC" });
+      if (!user || parsedWallet.data.country !== user.country || !await getActiveCountry(user.country)) {
+        return res.status(400).json({ message: "Le portefeuille doit correspondre au pays actif de votre compte" });
       }
-      if (!await isRdcOperator(parsedWallet.data.paymentMethod)) {
-        return res.status(400).json({ message: "Sélectionnez un opérateur RDC disponible" });
+      if (!await isActiveCountryOperator(user.country, parsedWallet.data.paymentMethod)) {
+        return res.status(400).json({ message: "Sélectionnez un opérateur disponible dans votre pays" });
       }
       const wallet = await storage.createWallet({
         userId: req.session.userId!,
@@ -1887,7 +1920,7 @@ export async function registerRoutes(
     }
   });
 
-  // Daily bonus claim (204 CDF every 24h)
+  // Daily bonus claim (204 FCFA every 24h)
   app.post("/api/claim-daily-bonus", requireAuth, async (req, res) => {
     try {
       const user = await storage.getUser(req.session.userId!);
@@ -1910,7 +1943,7 @@ export async function registerRoutes(
         }
       }
 
-      // Add 204 CDF to balance
+      // Add 204 FCFA to balance
       const newBalance = parseFloat(user.balance) + 204;
       await storage.updateUser(user.id, { 
         balance: newBalance.toString(),
@@ -1925,7 +1958,7 @@ export async function registerRoutes(
         description: "Bonus quotidien"
       });
 
-      res.json({ success: true, message: "Bonus de 204 CDF ajouté !" });
+      res.json({ success: true, message: "Bonus de 204 FCFA ajouté !" });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -2103,7 +2136,7 @@ export async function registerRoutes(
         await storage.processDepositReferralCommissions(deposit.userId, deposit.amount);
       }
 
-      await storage.logAdminAction(req.session.userId!, "approve_deposit", deposit.userId, `Dépôt ${deposit.id} approuvé: ${deposit.amount} CDF`);
+      await storage.logAdminAction(req.session.userId!, "approve_deposit", deposit.userId, `Dépôt ${deposit.id} approuvé: ${deposit.amount} FCFA`);
       res.json(deposit);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
@@ -2187,7 +2220,7 @@ export async function registerRoutes(
         processedBy: req.session.userId,
       });
 
-      await storage.logAdminAction(req.session.userId!, "approve_withdrawal", withdrawalData.userId, `Retrait ${withdrawal.id} approuvé: ${withdrawalData.netAmount} CDF`);
+      await storage.logAdminAction(req.session.userId!, "approve_withdrawal", withdrawalData.userId, `Retrait ${withdrawal.id} approuvé: ${withdrawalData.netAmount} FCFA`);
       res.json(withdrawal);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
@@ -2254,7 +2287,7 @@ export async function registerRoutes(
       switch (action) {
         case "balance":
           await storage.updateUser(userId, { balance: value.toFixed(2) });
-          await storage.logAdminAction(req.session.userId!, "update_balance", userId, `Solde modifié: ${value} CDF`);
+          await storage.logAdminAction(req.session.userId!, "update_balance", userId, `Solde modifié: ${value} FCFA`);
           break;
         case "password":
           await storage.updateUser(userId, { password: value });
@@ -2589,7 +2622,7 @@ export async function registerRoutes(
         createdBy: req.session.userId!,
       });
 
-      await storage.logAdminAction(req.session.userId!, "create_gift_code", null, `Code cadeau cree: ${code} - ${amount} CDF`);
+      await storage.logAdminAction(req.session.userId!, "create_gift_code", null, `Code cadeau cree: ${code} - ${amount} FCFA`);
       res.json(giftCode);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
@@ -2647,7 +2680,7 @@ export async function registerRoutes(
       
       res.json({ 
         success: true, 
-        message: `Félicitations! Vous avez reçu ${parseFloat(giftCode.amount).toLocaleString()} CDF`,
+        message: `Félicitations! Vous avez reçu ${parseFloat(giftCode.amount).toLocaleString()} FCFA`,
         amount: parseFloat(giftCode.amount)
       });
     } catch (error: any) {
@@ -2659,7 +2692,9 @@ export async function registerRoutes(
   app.get("/api/countries", async (req, res) => {
     try {
       const activeCountries = await storage.getActiveCountries();
-      res.json(activeCountries.filter((country) => country.code === RDC_COUNTRY_CODE));
+      res.json(activeCountries.filter((country) =>
+        SUPPORTED_COUNTRY_CODES.includes(country.code as typeof SUPPORTED_COUNTRY_CODES[number]),
+      ));
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -2668,24 +2703,29 @@ export async function registerRoutes(
   app.get("/api/deposit/provider/:country", requireAuth, async (req, res) => {
     try {
       const country = getRouteParam(req, "country").toUpperCase();
-      if (country !== RDC_COUNTRY_CODE) {
+      if (!await getActiveCountry(country)) {
         return res.status(404).json({ message: "Pays indisponible" });
       }
        const settings = await storage.getSettings();
       const enabledCodes = (value: string | undefined) =>
         (value || "").split(",").map(code => code.trim().toUpperCase()).filter(Boolean);
       const westpayCountries = enabledCodes(settings.westpayCountries);
-      const providers: Array<{ provider: "westpay" | "sendavapay"; name: string }> = [];
+      const providers: Array<{ provider: "westpay" | "sendavapay" | "ashtechpay"; name: string }> = [];
       if (settings.westpayEnabled === "true" &&
-          (westpayCountries.length === 0 || westpayCountries.includes(RDC_COUNTRY_CODE))) {
+          (westpayCountries.length === 0 || westpayCountries.includes(country))) {
         providers.push({ provider: "westpay", name: settings.westpayChannelName || "WestPay" });
       }
       if (settings.sendavapayEnabled === "true") {
         providers.push({ provider: "sendavapay", name: settings.sendavapayChannelName || "SendavaPay" });
       }
+      const ashtechCountries = enabledCodes(settings.ashtechCountries);
+      if (settings.ashtechEnabled === "true" && isAshtechConfigured() &&
+          (ashtechCountries.length === 0 || ashtechCountries.includes(country))) {
+        providers.push({ provider: "ashtechpay", name: settings.ashtechChannelName || "AshtechPay" });
+      }
       return res.json(providers[0]
         ? { ...providers[0], providers }
-        : { provider: "manual", name: "Numéro de paiement RDC", providers });
+        : { provider: "manual", name: "Numéro de paiement", providers });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -2694,8 +2734,7 @@ export async function registerRoutes(
   // Admin country routes
   app.get("/api/admin/countries", requireAdmin, async (req, res) => {
     try {
-      const allCountries = await storage.getCountries();
-      res.json(allCountries.filter((country) => country.code === RDC_COUNTRY_CODE));
+      res.json(await storage.getCountries());
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -2703,7 +2742,19 @@ export async function registerRoutes(
 
   app.post("/api/admin/countries", requireAdmin, async (req, res) => {
     try {
-      return res.status(400).json({ message: "La plateforme est configurée uniquement pour la RDC. Modifiez les opérateurs RDC existants." });
+      const { code, name, currency, phonePrefix, operators, isActive } = req.body;
+      const normalizedCode = String(code || "").trim().toUpperCase();
+      if (!SUPPORTED_COUNTRY_CODES.includes(normalizedCode as typeof SUPPORTED_COUNTRY_CODES[number])) {
+        return res.status(400).json({ message: "Seuls les pays pris en charge peuvent être ajoutés" });
+      }
+      if (!name || !currency || !phonePrefix || typeof operators !== "string") {
+        return res.status(400).json({ message: "Tous les champs sont requis" });
+      }
+      const country = await storage.createCountry({
+        code: normalizedCode, name: String(name).trim(), currency: String(currency).trim().toUpperCase(),
+        phonePrefix: String(phonePrefix).replace(/\D/g, ""), operators, isActive: isActive !== false,
+      });
+      res.json(country);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
@@ -2712,13 +2763,24 @@ export async function registerRoutes(
   app.put("/api/admin/countries/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(getRouteParam(req, "id"));
-      const { operators } = req.body;
-      const updateData: any = {};
+      const { code, name, currency, phonePrefix, operators, isActive } = req.body;
       const existing = await storage.getCountry(id);
-      if (!existing || existing.code !== RDC_COUNTRY_CODE) {
-        return res.status(404).json({ message: "Configuration RDC introuvable" });
+      if (!existing) {
+        return res.status(404).json({ message: "Configuration pays introuvable" });
       }
+      const updateData: any = {};
+      if (code !== undefined) {
+        const normalizedCode = String(code).trim().toUpperCase();
+        if (!SUPPORTED_COUNTRY_CODES.includes(normalizedCode as typeof SUPPORTED_COUNTRY_CODES[number])) {
+          return res.status(400).json({ message: "Code pays non pris en charge" });
+        }
+        updateData.code = normalizedCode;
+      }
+      if (name !== undefined) updateData.name = String(name).trim();
+      if (currency !== undefined) updateData.currency = String(currency).trim().toUpperCase();
+      if (phonePrefix !== undefined) updateData.phonePrefix = String(phonePrefix).replace(/\D/g, "");
       if (operators !== undefined) updateData.operators = operators;
+      if (isActive !== undefined) updateData.isActive = Boolean(isActive);
       const country = await storage.updateCountry(id, updateData);
       res.json(country);
     } catch (error: any) {
@@ -2728,7 +2790,10 @@ export async function registerRoutes(
 
   app.delete("/api/admin/countries/:id", requireAdmin, async (req, res) => {
     try {
-      return res.status(400).json({ message: "La configuration RDC ne peut pas être supprimée" });
+      const existing = await storage.getCountry(parseInt(getRouteParam(req, "id")));
+      if (!existing) return res.status(404).json({ message: "Configuration pays introuvable" });
+      await storage.updateCountry(existing.id, { isActive: false });
+      res.json({ success: true });
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
@@ -2766,7 +2831,7 @@ export async function registerRoutes(
         await storage.createTransaction({ userId: user.id, type: "deposit", amount: deposit.amount.toString(), description: "Dépôt validé par bankier" });
         await storage.processDepositReferralCommissions(deposit.userId, deposit.amount);
       }
-      await storage.logAdminAction(req.session.userId!, "approve_deposit", deposit.userId, `Dépôt ${deposit.id} approuvé par bankier: ${deposit.amount} CDF`);
+      await storage.logAdminAction(req.session.userId!, "approve_deposit", deposit.userId, `Dépôt ${deposit.id} approuvé par bankier: ${deposit.amount} FCFA`);
       res.json(deposit);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
@@ -2798,7 +2863,7 @@ export async function registerRoutes(
         processedAt: new Date(),
         processedBy: req.session.userId,
       });
-      await storage.logAdminAction(req.session.userId!, "approve_withdrawal", withdrawalData.userId, `Retrait ${withdrawal.id} approuvé par bankier: ${withdrawalData.netAmount} CDF`);
+      await storage.logAdminAction(req.session.userId!, "approve_withdrawal", withdrawalData.userId, `Retrait ${withdrawal.id} approuvé par bankier: ${withdrawalData.netAmount} FCFA`);
       res.json(withdrawal);
     } catch (error: any) {
       res.status(400).json({ message: error.message });

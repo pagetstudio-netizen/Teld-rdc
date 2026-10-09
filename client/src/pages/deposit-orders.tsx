@@ -29,7 +29,7 @@ function formatDate(iso: string) {
 export default function DepositOrdersPage() {
   const { user } = useAuth();
   const countryInfo = user ? getCountryByCode(user.country) : null;
-  const currency = countryInfo?.currency || "CDF";
+  const currency = "FCFA";
 
   const { data: deposits = [], isLoading } = useQuery<Deposit[]>({
     queryKey: ["/api/deposits/history"],

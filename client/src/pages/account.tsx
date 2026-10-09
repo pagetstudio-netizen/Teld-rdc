@@ -409,7 +409,7 @@ export default function AccountPage() {
           <section className="balance-card" aria-label="My Balance">
             <div>
               <p className="balance-label">My Balance</p>
-               <p className="balance-amount"><span>{displayBalance}</span><small>CDF</small></p>
+               <p className="balance-amount"><span>{displayBalance}</span><small>FCFA</small></p>
             </div>
             <button type="button" className="balance-details" onClick={() => navigate("/history")} data-testid="button-balance-details">
               Détails &gt;

@@ -15,7 +15,7 @@ export default function SalaryBonusPage() {
   if (!user) return null;
 
   const country = getCountryByCode(user.country);
-  const currency = country?.currency || "CDF";
+  const currency = "FCFA";
   const level1Count = teamStats?.level1Count || 0;
   const totalCommission = parseFloat(teamStats?.totalCommission || "0");
   const totalPeople = (teamStats?.level1Count || 0) + (teamStats?.level2Count || 0) + (teamStats?.level3Count || 0);
