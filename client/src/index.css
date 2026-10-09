@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE - TELD (Tcharging) theme */
+/* LIGHT MODE - Suntory theme */
 :root {
   --button-outline: rgba(0,0,0, .10);
   --badge-outline: rgba(0,0,0, .05);
@@ -20,20 +20,20 @@
   --card-foreground: 0 0% 10%;
   --card-border: 0 0% 90%;
 
-  --sidebar: 184 100% 18%;
+  --sidebar: 190 80% 22%;
   --sidebar-foreground: 0 0% 100%;
-  --sidebar-border: 184 80% 12%;
+  --sidebar-border: 190 75% 16%;
   --sidebar-primary: 0 0% 100%;
-  --sidebar-primary-foreground: 184 100% 18%;
-  --sidebar-accent: 184 80% 26%;
+  --sidebar-primary-foreground: 190 80% 22%;
+  --sidebar-accent: 190 70% 30%;
   --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-ring: 184 100% 18%;
+  --sidebar-ring: 190 80% 22%;
 
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 10%;
   --popover-border: 0 0% 90%;
 
-  --primary: 184 100% 36%;
+  --primary: 190 60% 36%;
   --primary-foreground: 0 0% 100%;
 
   --secondary: 0 0% 96%;
@@ -42,14 +42,14 @@
   --muted: 0 0% 94%;
   --muted-foreground: 0 0% 45%;
 
-  --accent: 184 70% 93%;
-  --accent-foreground: 184 100% 36%;
+  --accent: 190 48% 94%;
+  --accent-foreground: 190 60% 30%;
 
   --destructive: 0 75% 55%;
   --destructive-foreground: 0 0% 100%;
 
   --input: 0 0% 85%;
-  --ring: 184 100% 36%;
+  --ring: 190 60% 36%;
   --chart-1: 0 75% 50%;
   --chart-2: 160 65% 45%;
   --chart-3: 200 70% 50%;
@@ -93,16 +93,17 @@
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
 }
 
-/* TELD theme.
- * The dashboard owns its layout but uses the same TELD palette in its own
+/* Suntory theme.
+ * The dashboard owns its layout but uses the same Suntory palette in its own
  * component styles. App.tsx adds this scope to every other route.
  */
-.teld-theme {
-  --teld-primary: #00ABB7;
-  --teld-dark: #008895;
-  --teld-deep: #00636c;
-  --teld-soft: #e5f7f8;
-  --teld-gradient: linear-gradient(112deg, #00ABB7 0%, #008895 100%);
+.suntory-theme {
+  --suntory-primary: #247f91;
+  --suntory-logo: #5cbfd0;
+  --suntory-dark: #185868;
+  --suntory-deep: #153f4a;
+  --suntory-soft: #e7f5f8;
+  --suntory-gradient: linear-gradient(112deg, #3199ac 0%, #247f91 100%);
 
   --background: 184 25% 97%;
   --foreground: 184 18% 13%;
@@ -113,87 +114,91 @@
   --popover: 0 0% 100%;
   --popover-foreground: 184 18% 13%;
   --popover-border: 184 18% 90%;
-  --primary: 184 100% 36%;
+  --primary: 190 60% 36%;
   --primary-foreground: 0 0% 100%;
   --secondary: 184 20% 94%;
   --secondary-foreground: 184 18% 13%;
   --muted: 184 16% 93%;
   --muted-foreground: 184 8% 43%;
-  --accent: 184 65% 93%;
-  --accent-foreground: 184 100% 30%;
+  --accent: 190 48% 94%;
+  --accent-foreground: 190 60% 30%;
   --input: 184 15% 84%;
-  --ring: 184 100% 36%;
-  --chart-1: 184 100% 36%;
-  --chart-2: 190 70% 38%;
-  --chart-3: 180 60% 42%;
-  --chart-4: 195 55% 40%;
-  --chart-5: 175 60% 42%;
+  --ring: 190 60% 36%;
+  --chart-1: 190 60% 36%;
+  --chart-2: 190 55% 42%;
+  --chart-3: 180 48% 46%;
+  --chart-4: 195 48% 42%;
+  --chart-5: 175 48% 42%;
 }
 
-/* Recolor recurring brand utilities to the TELD logo color.
+/* Recolor recurring brand utilities to the Suntory palette.
  */
-.teld-theme [class*="text-green-"],
-.teld-theme [class*="text-emerald-"],
-.teld-theme [class*="text-[#00CC2C]"],
-.teld-theme [class*="text-[#00cc2c]"],
-.teld-theme [class*="text-[#3174d1]"],
-.teld-theme [class*="text-[#2196F3]"],
-.teld-theme [class*="text-[#1598e7]"],
-.teld-theme [class*="text-[#0789c9]"],
-.teld-theme [class*="text-[#7fc9ff]"] {
-  color: var(--teld-primary) !important;
+.suntory-theme [class*="text-green-"],
+.suntory-theme [class*="text-emerald-"],
+.suntory-theme [class*="text-[#00CC2C]"],
+.suntory-theme [class*="text-[#00cc2c]"],
+.suntory-theme [class*="text-[#3174d1]"],
+.suntory-theme [class*="text-[#2196F3]"],
+.suntory-theme [class*="text-[#1598e7]"],
+.suntory-theme [class*="text-[#0789c9]"],
+.suntory-theme [class*="text-[#7fc9ff]"] {
+  color: var(--suntory-primary) !important;
 }
 
-.teld-theme [class*="bg-green-"],
-.teld-theme [class*="bg-emerald-"],
-.teld-theme [class*="bg-[#00CC2C]"],
-.teld-theme [class*="bg-[#00cc2c]"],
-.teld-theme [class*="bg-[#3174d1]"],
-.teld-theme [class*="bg-[#2196F3]"],
-.teld-theme [class*="bg-[#55c9e5]"] {
-  background-color: var(--teld-primary) !important;
+.suntory-theme [class*="bg-green-"],
+.suntory-theme [class*="bg-emerald-"],
+.suntory-theme [class*="bg-[#00CC2C]"],
+.suntory-theme [class*="bg-[#00cc2c]"],
+.suntory-theme [class*="bg-[#3174d1]"],
+.suntory-theme [class*="bg-[#2196F3]"],
+.suntory-theme [class*="bg-[#55c9e5]"] {
+  background-color: var(--suntory-primary) !important;
 }
 
-.teld-theme [class*="border-green-"],
-.teld-theme [class*="border-emerald-"],
-.teld-theme [class*="border-[#00CC2C]"],
-.teld-theme [class*="border-[#00cc2c]"],
-.teld-theme [class*="border-[#3174d1]"],
-.teld-theme [class*="border-[#2196F3]"],
-.teld-theme [class*="border-[#55c9e5]"],
-.teld-theme [class*="border-[#7fc9ff]"] {
-  border-color: var(--teld-primary) !important;
+.suntory-theme [class*="border-green-"],
+.suntory-theme [class*="border-emerald-"],
+.suntory-theme [class*="border-[#00CC2C]"],
+.suntory-theme [class*="border-[#00cc2c]"],
+.suntory-theme [class*="border-[#3174d1]"],
+.suntory-theme [class*="border-[#2196F3]"],
+.suntory-theme [class*="border-[#55c9e5]"],
+.suntory-theme [class*="border-[#7fc9ff]"] {
+  border-color: var(--suntory-primary) !important;
 }
 
-/* Inline gradients are used for branded headers and action buttons.
- * Preserve black authentication overlays while changing colored gradients.
+/* Recolor inline gradients only when they contain an old brand color.
+ * Preserve translucent photo overlays and status gradients.
  */
-.teld-theme [style*="linear-gradient"]:not([style*="#000000"]):not([style*="rgb(0, 0, 0)"]):not([style*="rgba(0,0,0"]):not([style*="rgba(0, 0, 0"]) {
-  background: var(--teld-gradient) !important;
+.suntory-theme [style*="linear-gradient"][style*="#00ABB7"],
+.suntory-theme [style*="linear-gradient"][style*="#008895"],
+.suntory-theme [style*="linear-gradient"][style*="#3174d1"],
+.suntory-theme [style*="linear-gradient"][style*="#55c9e5"],
+.suntory-theme [style*="linear-gradient"][style*="#2196F3"] {
+  background: var(--suntory-gradient) !important;
 }
 
-.teld-theme [style*="color"][style*="#00CC2C"],
-.teld-theme [style*="color"][style*="#00cc2c"],
-.teld-theme [style*="color"][style*="#3174d1"],
-.teld-theme [style*="color"][style*="#55c9e5"],
-.teld-theme [style*="color"][style*="#2196F3"],
-.teld-theme [style*="color"][style*="rgb(0, 204, 44)"],
-.teld-theme [style*="color"][style*="rgb(33, 150, 243)"] {
-  color: var(--teld-primary) !important;
+.suntory-theme [style*="color"][style*="#00CC2C"],
+.suntory-theme [style*="color"][style*="#00cc2c"],
+.suntory-theme [style*="color"][style*="#3174d1"],
+.suntory-theme [style*="color"][style*="#55c9e5"],
+.suntory-theme [style*="color"][style*="#2196F3"],
+.suntory-theme [style*="color"][style*="rgb(0, 204, 44)"],
+.suntory-theme [style*="color"][style*="rgb(33, 150, 243)"] {
+  color: var(--suntory-primary) !important;
 }
 
-.teld-theme [style*="background"][style*="#00CC2C"],
-.teld-theme [style*="background"][style*="#00cc2c"],
-.teld-theme [style*="background"][style*="#3174d1"],
-.teld-theme [style*="background"][style*="#55c9e5"],
-.teld-theme [style*="background"][style*="#2196F3"],
-.teld-theme [style*="background"][style*="rgb(0, 204, 44)"],
-.teld-theme [style*="background"][style*="rgb(33, 150, 243)"] {
-  background-color: var(--teld-primary) !important;
+.suntory-theme [style*="background"][style*="#00CC2C"],
+.suntory-theme [style*="background"][style*="#00cc2c"],
+.suntory-theme [style*="background"][style*="#3174d1"],
+.suntory-theme [style*="background"][style*="#55c9e5"],
+.suntory-theme [style*="background"][style*="#2196F3"],
+.suntory-theme [style*="background"][style*="rgb(0, 204, 44)"],
+.suntory-theme [style*="background"][style*="rgb(33, 150, 243)"] {
+  background-color: var(--suntory-primary) !important;
 }
 
-.teld-theme [style*="linear-gradient"][style*="#3174d1"],
-.teld-theme [style*="linear-gradient"][style*="#55c9e5"] {
+.suntory-theme [style*="linear-gradient"][style*="#3174d1"],
+.suntory-theme [style*="linear-gradient"][style*="#55c9e5"] {
   color: white !important;
 }
 
@@ -221,13 +226,13 @@
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 0 0% 15%;
   --sidebar-accent-foreground: 0 0% 95%;
-  --sidebar-ring: 184 100% 42%;
+  --sidebar-ring: 190 60% 42%;
 
   --popover: 0 0% 10%;
   --popover-foreground: 0 0% 95%;
   --popover-border: 0 0% 18%;
 
-  --primary: 184 100% 42%;
+  --primary: 190 60% 42%;
   --primary-foreground: 0 0% 100%;
 
   --secondary: 0 0% 18%;
@@ -236,14 +241,14 @@
   --muted: 0 0% 15%;
   --muted-foreground: 0 0% 55%;
 
-  --accent: 16 80% 45%;
+  --accent: 190 48% 35%;
   --accent-foreground: 0 0% 100%;
 
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 100%;
 
   --input: 0 0% 22%;
-  --ring: 16 100% 50%;
+  --ring: 190 60% 42%;
   --chart-1: 16 100% 50%;
   --chart-2: 160 65% 45%;
   --chart-3: 200 70% 50%;

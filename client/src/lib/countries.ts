@@ -1,6 +1,6 @@
 // Fallback country data (used if API not available)
 export const COUNTRIES = [
-  { code: "TG", name: "Togo", flag: "TG", currency: "XOF", paymentMethods: ["T-Money", "Moov Money"] },
+  { code: "TG", name: "Togo", flag: "TG", currency: "XOF", paymentMethods: ["Mixx by Yas", "Moov Money"] },
   { code: "BJ", name: "Bénin", flag: "BJ", currency: "XOF", paymentMethods: ["MTN", "Moov Money"] },
   { code: "BF", name: "Burkina Faso", flag: "BF", currency: "XOF", paymentMethods: ["Orange Money", "Moov Money"] },
   { code: "CI", name: "Côte d'Ivoire", flag: "CI", currency: "XOF", paymentMethods: ["Orange Money", "MTN", "Moov Money", "Wave"] },
@@ -8,7 +8,7 @@ export const COUNTRIES = [
 ];
 
 export const FALLBACK_COUNTRIES = [
-  { code: "TG", name: "Togo", currency: "XOF", phonePrefix: "228", operators: ["T-Money", "Moov Money"] },
+  { code: "TG", name: "Togo", currency: "XOF", phonePrefix: "228", operators: ["Mixx by Yas", "Moov Money"] },
   { code: "BJ", name: "Bénin", currency: "XOF", phonePrefix: "229", operators: ["MTN", "Moov Money"] },
   { code: "BF", name: "Burkina Faso", currency: "XOF", phonePrefix: "226", operators: ["Orange Money", "Moov Money"] },
   { code: "CI", name: "Côte d'Ivoire", currency: "XOF", phonePrefix: "225", operators: ["Orange Money", "MTN", "Moov Money", "Wave"] },
@@ -37,14 +37,17 @@ export type ApiCountry = {
 
 export function parseOperators(operatorsJson: string): string[] {
   try {
-    return JSON.parse(operatorsJson);
+    const parsed: unknown = JSON.parse(operatorsJson);
+    return Array.isArray(parsed)
+      ? parsed.filter((operator): operator is string => typeof operator === "string")
+      : [];
   } catch {
     return [];
   }
 }
 
 export function getCountryByCode(code: string, apiCountries?: ApiCountry[]) {
-  if (apiCountries && apiCountries.length > 0) {
+  if (apiCountries !== undefined) {
     // API data is loaded — only use it, never fall back to hardcoded data
     // This ensures disabled countries and updated operators are respected
     const c = apiCountries.find(c => c.code === code && c.isActive);

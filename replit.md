@@ -1,8 +1,8 @@
-# TELD (Tcharging) - Connected Charging Platform
+# Suntory - Global Beverage Platform
 
 ## Overview
 
-TELD (Tcharging) est un leader incontournable qui possède l'un des plus grands réseaux de bornes connectées à travers le pays.
+Le Groupe Suntory a été fondé à Osaka en 1899 par Shinjiro Torii. D'abord consacré au développement du whisky japonais, il est aujourd'hui présent à l'international dans les boissons alcoolisées, les boissons sans alcool et les produits de santé, au sein de Suntory Holdings.
 
 ## User Preferences
 
@@ -39,8 +39,8 @@ Preferred communication style: Simple, everyday language.
 - **Middleware**: `requireAuth` and `requireAdmin` middleware for route protection
 
 ### Key Features
-- **Multi-country Support**: 7 African countries with different currencies (XAF, XOF, CDF) and payment methods
-- **Product System**: Virtual industrial robot products with daily earnings cycles
+- **Multi-country Support**: Active countries and mobile-money operators are stored in the database and managed from the admin panel; amounts are shown in FCFA
+- **Product System**: Product plans and daily earnings cycles configured by the administrator
 - **Referral System**: 3-level commission structure for team building
 - **Task System**: Invite-based tasks with bonus rewards
 - **Admin Panel**: Full CRUD for users, deposits, withdrawals, products, payment channels, and settings
@@ -138,10 +138,10 @@ The "Start application" workflow runs `npm run dev` and serves the app on port 5
 - **Product Cycle**: 80 days by default
 
 ## Supported Countries
-- Cameroun (CM) - XAF - Orange Money, MTN
-- Burkina Faso (BF) - XOF - Orange Money, Moov Money
-- Togo (TG) - XOF - Moov Money, Mixx by Yas
-- Benin (BJ) - XOF - Celtis, Moov Money, MTN, Momo
-- Cote d'Ivoire (CI) - XOF - Wave, MTN, Orange Money, Moov Money
-- Congo Brazzaville (CG) - XAF - MTN
-- RDC (CD) - CDF (4:1 conversion) - Airtel Money
+- Togo (TG) - XOF
+- Bénin (BJ) - XOF
+- Burkina Faso (BF) - XOF
+- Côte d'Ivoire (CI) - XOF
+- Cameroun (CM) - XAF
+
+The active country list and each country's operators are read from the `countries` database table. The five countries above are the configured supported set; operators remain editable in the admin panel.

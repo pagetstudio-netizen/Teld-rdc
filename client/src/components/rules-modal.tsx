@@ -12,16 +12,16 @@ export default function RulesModal({ open, onClose }: RulesModalProps) {
     queryKey: ["/api/settings"],
   });
 
-  const signupBonus = settings?.signupBonus || "2040";
-  const minDeposit = settings?.minDeposit || "12240";
-  const minWithdrawal = settings?.minWithdrawal || "6120";
+  const signupBonus = settings?.signupBonus || "500";
+  const minDeposit = settings?.minDeposit || "3000";
+  const minWithdrawal = settings?.minWithdrawal || "1000";
   const withdrawalFees = settings?.withdrawalFees || "18";
   const withdrawalStartHour = settings?.withdrawalStartHour || "9";
   const withdrawalEndHour = settings?.withdrawalEndHour || "17";
   const maxWithdrawalsPerDay = settings?.maxWithdrawalsPerDay || "1";
-  const lv1 = settings?.level1Commission || "15";
-  const lv2 = settings?.level2Commission || "2";
-  const lv3 = settings?.level3Commission || "1";
+  const lv1 = settings?.level1Commission || "20";
+  const lv2 = settings?.level2Commission || "5";
+  const lv3 = settings?.level3Commission || "2";
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -56,10 +56,10 @@ export default function RulesModal({ open, onClose }: RulesModalProps) {
             <section>
               <h4 className="font-medium text-foreground mb-2">3. Produits</h4>
               <ul className="space-y-1">
-                <li>- Cycle standard : 80 jours</li>
+                <li>- Durée des produits VIP : 60 jours</li>
                 <li>- Gains journaliers automatiques</li>
                 <li>- Les gains sont crédités 24h après l'achat</li>
-                <li>- Produit gratuit : réclamez 204 FCFA/jour</li>
+                <li>- Les montants des gains sont indiqués sur chaque produit</li>
               </ul>
             </section>
 

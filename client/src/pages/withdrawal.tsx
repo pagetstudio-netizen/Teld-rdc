@@ -3,12 +3,11 @@ import { useAuth } from "@/lib/auth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, History, Loader2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { getCountryByCode } from "@/lib/countries";
 
-import withdrawalReference from "@assets/IMG_20260823_162842_425_1787503826320.jpg";
-import teldLogo from "@assets/Teld-azul-scaled_1787505809423.png";
+import { suntoryLogo } from "@/lib/suntory-assets";
 
 interface WalletData {
   id: number;
@@ -48,7 +47,7 @@ export default function WithdrawalPage() {
     refetchOnMount: true,
   });
 
-  const minWithdrawal = withdrawalSettings?.minWithdrawal ?? 6120;
+  const minWithdrawal = withdrawalSettings?.minWithdrawal ?? 1000;
   const withdrawalFee = withdrawalSettings?.withdrawalFees ?? 18;
   const withdrawalStartHour = withdrawalSettings?.withdrawalStartHour ?? 9;
   const withdrawalEndHour = withdrawalSettings?.withdrawalEndHour ?? 17;
@@ -165,18 +164,24 @@ export default function WithdrawalPage() {
           position: relative;
           height: 112px;
           overflow: hidden;
-          background-image: url("${withdrawalReference}");
-          background-position: 0 -21.6797cqw;
-          background-repeat: no-repeat;
-          background-size: 100cqw auto;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(112deg, #3199ac 0%, #185868 100%);
+          color: #fff;
         }
         .withdrawal-reference .hero-hotspot {
           position: absolute;
           z-index: 2;
+          display: grid;
+          place-items: center;
           border: 0;
           background: transparent;
+          color: #fff;
           -webkit-tap-highlight-color: transparent;
         }
+        .withdrawal-reference .hero-hotspot svg { width: 25px; height: 25px; }
+        .withdrawal-reference .hero-title { margin: 0; color: #fff; font-size: 23px; font-weight: 700; }
         .withdrawal-reference .hero-hotspot:focus-visible {
           outline: 2px solid #fff;
           outline-offset: -2px;
@@ -385,13 +390,14 @@ export default function WithdrawalPage() {
 
       <div className="withdrawal-screen">
         <section className="withdrawal-hero" aria-label="Retrait">
-          <button type="button" className="hero-hotspot hero-back" onClick={() => navigate("/account")} aria-label="Retour" />
-          <button type="button" className="hero-hotspot hero-history" onClick={() => navigate("/history")} aria-label="Historique des retraits" />
+          <button type="button" className="hero-hotspot hero-back" onClick={() => navigate("/account")} aria-label="Retour"><ChevronLeft aria-hidden="true" /></button>
+          <h1 className="hero-title">Retrait</h1>
+          <button type="button" className="hero-hotspot hero-history" onClick={() => navigate("/history")} aria-label="Historique des retraits"><History aria-hidden="true" /></button>
         </section>
 
         <section className="withdrawal-panel">
           <section className="balance-summary" aria-label="Solde actuel">
-            <img className="balance-brand" src={teldLogo} alt="TELD (Tcharging)" />
+            <img className="balance-brand" src={suntoryLogo} alt="Suntory" />
             <p className="balance-label">Solde actuel</p>
             <p className="balance-value" data-testid="text-balance">FCFA {Math.round(balance).toLocaleString("fr-FR")}</p>
           </section>

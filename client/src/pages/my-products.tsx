@@ -99,7 +99,7 @@ export default function MyProductsPage() {
         .products-reference .products-screen { container-type: inline-size; width: 100%; max-width: 512px; margin: 0 auto; overflow: hidden; background: #fff; }
         .products-reference .products-header { display: grid; height: 81px; place-items: center; border-bottom: 1px solid #e4e4e4; background: #fff; }
         .products-reference .products-header h1 { margin: 0; color: #111; font-size: 19px; font-weight: 400; line-height: 1; }
-        .products-reference .products-stats { display: grid; height: 86px; grid-template-columns: 1fr 1fr; background: #00ABB7; color: white; }
+        .products-reference .products-stats { display: grid; height: 86px; grid-template-columns: 1fr 1fr; background: #247f91; color: white; }
         .products-reference .products-stat { display: flex; align-items: flex-start; flex-direction: column; justify-content: center; border: 0; padding: 0 21px; background: transparent; color: white; text-align: left; transition: background-color 120ms ease, transform 120ms ease; }
         .products-reference .products-stat:active { background: rgba(0,0,0,.06); transform: scale(.98); }
         .products-reference .products-stat-value { display: block; max-width: 100%; overflow: hidden; font-size: 25px; font-weight: 400; line-height: 1; text-overflow: ellipsis; white-space: nowrap; }
@@ -107,14 +107,14 @@ export default function MyProductsPage() {
         .products-reference .product-list { padding: 0 0 20px; background: #fff; }
          .products-reference .product-card { position: relative; display: grid; height: auto; min-height: 265px; grid-template-columns: minmax(0, 29.69%) minmax(0, 1fr); column-gap: 24px; margin: 10px 13px 11px; overflow: hidden; border: 1px solid #a8dfe3; border-radius: 9px; padding: 20px 14px 78px; background: #fff; box-shadow: 0 1px 3px rgba(0,123,136,.08); }
          .products-reference .product-picture { position: static; display: flex; width: 100%; height: auto; aspect-ratio: 1.15; align-items: center; justify-content: center; overflow: hidden; border-radius: 9px; background: #eef7f8; }
-         .products-reference .product-picture img { display: block; width: 100%; height: 100%; object-fit: cover; }
+         .products-reference .product-picture img { display: block; width: 100%; height: 100%; object-fit: contain; background: #f7fbfc; }
          .products-reference .product-details { min-width: 0; align-self: start; }
         .products-reference .product-name { overflow: hidden; margin: 0; color: #111; font-size: 20px; font-weight: 700; line-height: 1.05; text-overflow: ellipsis; white-space: nowrap; }
-         .products-reference .product-price { margin: 15px 0 0; color: #008895; font-size: 17px; font-weight: 400; line-height: 1; }
+         .products-reference .product-price { margin: 15px 0 0; color: #185868; font-size: 17px; font-weight: 400; line-height: 1; }
          .products-reference .product-line { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 8px; margin: 14px 0 0; color: #171717; font-size: 14px; font-weight: 400; line-height: 1.2; }
          .products-reference .product-line span { min-width: 0; overflow-wrap: anywhere; }
          .products-reference .product-line strong { min-width: 0; color: #171717; font-weight: 400; text-align: right; overflow-wrap: anywhere; }
-        .products-reference .buy { position: absolute; right: 14px; bottom: 27px; left: 14px; display: grid; height: 40px; place-items: center; border: 0; border-radius: 20px; padding: 0; background: #00ABB7; box-shadow: 0 1px 2px rgba(0, 123, 136, .16); color: white; font-size: 18px; font-weight: 400; line-height: 1; transition: filter 120ms ease, transform 120ms ease; }
+        .products-reference .buy { position: absolute; right: 14px; bottom: 27px; left: 14px; display: grid; height: 40px; place-items: center; border: 0; border-radius: 20px; padding: 0; background: #247f91; box-shadow: 0 1px 2px rgba(36, 127, 145, .16); color: white; font-size: 18px; font-weight: 400; line-height: 1; transition: filter 120ms ease, transform 120ms ease; }
         .products-reference .buy:active { filter: brightness(.93); transform: scale(.99); }
          .products-reference .my-card { min-height: 265px; height: auto; padding-bottom: 22px; }
          .products-reference .my-card .product-details { margin: 0; }
@@ -158,7 +158,7 @@ export default function MyProductsPage() {
           <div>
             {loadingProducts ? (
               <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-[#00ABB7]" />
+                <Loader2 className="w-8 h-8 animate-spin text-[#247f91]" />
               </div>
             ) : paidProducts.length === 0 ? (
               <div className="empty">
@@ -199,12 +199,12 @@ export default function MyProductsPage() {
             <div>
               {loadingUserProducts ? (
                 <div className="flex justify-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-[#00ABB7]" />
+                  <Loader2 className="w-8 h-8 animate-spin text-[#247f91]" />
                 </div>
               ) : allUserProducts.length === 0 ? (
                 <div className="empty">
                   <img src={emptyIllustration} alt="Vide" />
-                  <p>Aucun produit TELD (Tcharging)</p>
+                  <p>Aucun produit Suntory</p>
                   <p className="text-sm text-gray-400">Achetez des produits pour commencer à gagner</p>
                 </div>
               ) : (
@@ -284,7 +284,7 @@ export default function MyProductsPage() {
                 onClick={() => purchaseMutation.mutate(confirmProduct.id)}
                 disabled={purchaseMutation.isPending}
                 className="flex-1 py-4 font-bold text-base text-white flex items-center justify-center gap-1.5 active:opacity-90 transition-opacity disabled:opacity-60"
-                style={{ background: "#00ABB7" }}
+                style={{ background: "#247f91" }}
                 data-testid="button-confirm-purchase"
               >
                 {purchaseMutation.isPending

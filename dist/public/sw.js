@@ -1,5 +1,5 @@
-const CACHE_NAME = "stone-ton-v2";
-const STATIC_ASSETS = ["/", "/manifest.json", "/favicon.png?v=ton"];
+const CACHE_NAME = "suntory-v1";
+const STATIC_ASSETS = ["/", "/manifest.json", "/brand/suntory-icon-192.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

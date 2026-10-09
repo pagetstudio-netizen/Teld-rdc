@@ -5,8 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getCountryByCode } from "@/lib/countries";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
-import checkinHero from "@assets/images_(74)_1787504539004.jpeg";
-import teldLogo from "@assets/Teld-azul-scaled_1787504539099.png";
+import { bottlingLine } from "@/lib/suntory-assets";
 
 interface BonusStatus {
   canClaim: boolean;
@@ -142,10 +141,10 @@ export default function CheckinPage() {
           overflow: hidden;
           border: 4px solid white;
           border-radius: 50%;
-          background-image: url("${teldLogo}");
-          background-position: left center;
+          background-image: url("/favicon.png?v=suntory-1");
+          background-position: center;
           background-repeat: no-repeat;
-          background-size: cover;
+          background-size: 68% 68%;
           background-color: white;
           box-shadow: 0 2px 4px rgba(0,0,0,.12);
           transform: translateX(-50%);
@@ -185,7 +184,7 @@ export default function CheckinPage() {
           text-align: center;
         }
         .checkin-reference .stat-value {
-          color: #00ABB7;
+          color: #247f91;
           font-size: 35px;
           font-weight: 800;
           letter-spacing: -.8px;
@@ -201,7 +200,7 @@ export default function CheckinPage() {
         }
         .checkin-reference .stat-label {
           margin-top: 15px;
-          color: #008895;
+          color: #185868;
           font-size: 13px;
           font-weight: 500;
           line-height: 1;
@@ -214,7 +213,7 @@ export default function CheckinPage() {
           justify-content: center;
           margin: 14px 48px 0;
           border-radius: 34px;
-          background: #00ABB7;
+          background: #247f91;
           color: white;
           font-size: 26px;
           font-weight: 400;
@@ -249,7 +248,7 @@ export default function CheckinPage() {
       <div className="checkin-screen">
         <section className="hero" aria-label="Check-in quotidien">
           <div className="hero-art">
-            <img src={checkinHero} alt="" />
+            <img src={bottlingLine} alt="" />
           </div>
           <button className="back" onClick={() => navigate("/")}>
             <ChevronLeft aria-hidden="true" />

@@ -19,7 +19,7 @@ export function CountrySelector({ open, onClose, onSelect, selectedCountryCode }
 
   if (!open) return null;
 
-  const countries = (apiCountries && apiCountries.length > 0
+  const countries = (apiCountries !== undefined
     ? apiCountries.filter(c => c.isActive).map(c => ({ code: c.code, name: c.name, phonePrefix: c.phonePrefix }))
     : FALLBACK_COUNTRIES.map(c => ({ code: c.code, name: c.name, phonePrefix: c.phonePrefix })))
     .filter(country => {

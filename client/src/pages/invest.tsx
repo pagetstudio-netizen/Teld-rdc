@@ -10,7 +10,7 @@ import emptyIllustration from "@assets/illustration-8_1784762965573.png";
 import { useLocation } from "wouter";
 import type { Product } from "@shared/schema";
 
-import teldLogo from "@assets/Teld-azul-scaled_1787504539099.png";
+import { suntoryLogo } from "@/lib/suntory-assets";
 import serviceIcon from "@assets/20260311_214852_1773265973964.png";
 import { companyProductImages } from "@/lib/product-images";
 import { formatCompanyProductName } from "@/lib/product-names";
@@ -71,11 +71,11 @@ export default function InvestPage() {
       {/* ── Header ── */}
       <div
         className="flex items-center justify-between px-4 py-3 shadow-sm"
-        style={{ background: "linear-gradient(135deg, #FF4500 0%, #E03E00 100%)" }}
+        style={{ background: "linear-gradient(135deg, #3199ac 0%, #185868 100%)" }}
       >
           <div className="flex items-center gap-2">
-            <img src={teldLogo} alt="Logo TELD (Tcharging)" className="h-8 w-8 rounded-md object-cover object-left" />
-            <span className="text-white text-sm font-bold">TELD (Tcharging)</span>
+            <img src={suntoryLogo} alt="Suntory" className="h-8 w-auto max-w-28 rounded-md bg-white px-1 object-contain" />
+            <span className="text-white text-sm font-bold">Suntory</span>
           </div>
         <button
           onClick={() => navigate("/service")}
@@ -93,9 +93,9 @@ export default function InvestPage() {
           className="px-5 py-2 rounded-full font-bold text-sm transition-all"
           style={{
             background: activeTab === "all"
-              ? "linear-gradient(135deg, #16a34a, #22c55e)"
-              : "linear-gradient(135deg, #bbf7d0, #86efac)",
-            color: activeTab === "all" ? "#fff" : "#15803d",
+              ? "linear-gradient(135deg, #3199ac, #247f91)"
+              : "linear-gradient(135deg, #e3f3f6, #d4edf1)",
+            color: activeTab === "all" ? "#fff" : "#185868",
           }}
         >
           our products
@@ -105,9 +105,9 @@ export default function InvestPage() {
           className="px-5 py-2 rounded-full font-bold text-sm transition-all"
           style={{
             background: activeTab === "mine"
-              ? "linear-gradient(135deg, #16a34a, #22c55e)"
-              : "linear-gradient(135deg, #bbf7d0, #86efac)",
-            color: activeTab === "mine" ? "#fff" : "#15803d",
+              ? "linear-gradient(135deg, #3199ac, #247f91)"
+              : "linear-gradient(135deg, #e3f3f6, #d4edf1)",
+            color: activeTab === "mine" ? "#fff" : "#185868",
           }}
         >
           my product
@@ -132,7 +132,7 @@ export default function InvestPage() {
                   <img
                     src={img}
                     alt={formatCompanyProductName(product.name, product.id)}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full bg-[#f7fbfc] object-contain"
                     style={{ minHeight: 160 }}
                   />
                 </div>
@@ -162,7 +162,7 @@ export default function InvestPage() {
                     ].map(({ label, value }) => (
                       <div key={label} className="flex items-center justify-between">
                         <span className="text-gray-400 text-[11px]">{label}</span>
-                        <span className="font-bold text-[11px]" style={{ color: "var(--teld-primary)" }}>{value}</span>
+                        <span className="font-bold text-[11px]" style={{ color: "var(--suntory-primary)" }}>{value}</span>
                       </div>
                     ))}
                   </div>
@@ -196,7 +196,7 @@ export default function InvestPage() {
           >
             <div
               className="w-full max-w-xs rounded-3xl overflow-hidden shadow-2xl"
-              style={{ background: "linear-gradient(160deg, #FF4500 0%, #E03E00 100%)" }}
+              style={{ background: "linear-gradient(160deg, #3199ac 0%, #185868 100%)" }}
               onClick={e => e.stopPropagation()}
             >
               {/* ── Title block ── */}
@@ -213,7 +213,7 @@ export default function InvestPage() {
               <div className="mx-5 mb-4 flex items-start gap-4">
                 {/* Product image */}
                 <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 border-2 border-white/20">
-                  <img src={prodImg} alt={formatCompanyProductName(confirmProduct.name, confirmProduct.id)} className="w-full h-full object-cover" />
+                  <img src={prodImg} alt={formatCompanyProductName(confirmProduct.name, confirmProduct.id)} className="w-full h-full bg-white object-contain" />
                 </div>
 
                 {/* Info list */}

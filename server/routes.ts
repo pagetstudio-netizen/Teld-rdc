@@ -22,7 +22,6 @@ import {
   verifyWebhookSignature as sendavapayVerifySignature,
   mapSendavapayStatus,
   formatPhone as sendavapayFormatPhone,
-  getCurrency as sendavapayGetCurrency,
   toSendavapayCountry,
 } from "./sendavapay";
 import {
@@ -210,8 +209,6 @@ function validatePhone(value: unknown, fieldName: string): string {
   return result.data;
 }
 
-const SUPPORTED_COUNTRY_CODES = ["TG", "BJ", "BF", "CI", "CM"] as const;
-
 function parseCountryOperators(value: string): string[] {
   try {
     const parsed = JSON.parse(value);
@@ -223,10 +220,23 @@ function parseCountryOperators(value: string): string[] {
   }
 }
 
+function normalizeCountryOperators(value: unknown): string {
+  if (typeof value !== "string") throw new Error("La liste des opérateurs est invalide");
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(value);
+  } catch {
+    throw new Error("La liste des opérateurs doit être un JSON valide");
+  }
+  if (!Array.isArray(parsed) || parsed.some((operator) => typeof operator !== "string")) {
+    throw new Error("La liste des opérateurs doit contenir uniquement du texte");
+  }
+  return JSON.stringify(Array.from(new Set(parsed.map((operator) => operator.trim()).filter(Boolean))));
+}
+
 async function getActiveCountry(code: unknown) {
   if (typeof code !== "string") return undefined;
   const normalizedCode = code.trim().toUpperCase();
-  if (!SUPPORTED_COUNTRY_CODES.includes(normalizedCode as typeof SUPPORTED_COUNTRY_CODES[number])) return undefined;
   const countries = await storage.getActiveCountries();
   return countries.find((country) => country.code === normalizedCode);
 }
@@ -875,7 +885,7 @@ export async function registerRoutes(
       }
 
       const settings = await storage.getSettings();
-      const minDeposit = parseInt(settings.minDeposit || "3500");
+      const minDeposit = parseInt(settings.minDeposit || "3000");
        const requestedAmount = typeof amount === "number" ? amount : Number(amount);
        if (!Number.isFinite(requestedAmount) || requestedAmount < minDeposit) {
         return res.status(400).json({ message: `Montant minimum: ${minDeposit.toLocaleString()} FCFA` });
@@ -899,7 +909,8 @@ export async function registerRoutes(
          }
        }
        const normalizedDeposit = parsedDeposit.data;
-       if (normalizedDeposit.country !== user.country || !await getActiveCountry(normalizedDeposit.country)) {
+       const depositCountry = await getActiveCountry(normalizedDeposit.country);
+       if (normalizedDeposit.country !== user.country || !depositCountry) {
          return res.status(400).json({ message: "Le dépôt doit être effectué pour le pays de votre compte" });
        }
        if (useSoleaspay) {
@@ -927,7 +938,7 @@ export async function registerRoutes(
 
       const soleaspayEnabled = settings.soleaspayEnabled !== "false";
       const soleaspayCountries = settings.soleaspayCountries ? settings.soleaspayCountries.split(",").filter(Boolean) : [];
-      const orderId = `JOLLIBEE-${Date.now()}-${user.id}`;
+      const orderId = `SUNTORY-${Date.now()}-${user.id}`;
       
       // Only use Soleaspay when user explicitly chose the Soleaspay channel (Westpay)
       if (useSoleaspay && soleaspayEnabled) {
@@ -1014,6 +1025,7 @@ export async function registerRoutes(
           const westpayUrl = westpayBuildUrl({
             amount: normalizedDeposit.amount,
             countryCode: normalizedDeposit.country,
+            countryName: depositCountry.name,
             redirectUrl: callbackUrl,
           });
           return res.json({ deposit, westpayUrl, westpay: true });
@@ -1388,10 +1400,10 @@ export async function registerRoutes(
       }
 
       const svCountry = toSendavapayCountry(country);
-      const currency = sendavapayGetCurrency(country);
+      const currency = activeCountry.currency;
       const externalRef = `DEP-${Date.now()}-${user.id}`;
       // Only use the number explicitly entered for this deposit; never reuse the profile phone.
-      const customerPhone = sendavapayFormatPhone(payerPhone.trim(), country);
+      const customerPhone = sendavapayFormatPhone(payerPhone.trim(), activeCountry.code, activeCountry.phonePrefix);
       const devDomain = process.env.REPLIT_DEV_DOMAIN;
       const baseUrl = devDomain ? `https://${devDomain}` : "https://sybotx.replit.app";
       const webhookUrl = `${baseUrl}/api/webhooks/sendavapay`;
@@ -1419,7 +1431,7 @@ export async function registerRoutes(
         amount,
         accountName: user.fullName,
         accountNumber: customerPhone,
-        country,
+        country: activeCountry.code,
         paymentMethod: operatorName || "SendavaPay",
         status: "processing",
         sendavapayReference: result.data.reference,
@@ -1448,12 +1460,15 @@ export async function registerRoutes(
         return res.status(400).json({ message: "Le numéro Mobile Money est requis" });
       }
       const deposit = depositId ? await storage.getDeposit(Number(depositId)) : undefined;
-      if (!deposit || deposit.userId !== user.id || !await getActiveCountry(payerCountry) || deposit.country !== String(payerCountry).toUpperCase()) {
+      const activeCountry = await getActiveCountry(payerCountry);
+      if (!deposit || deposit.userId !== user.id || !activeCountry ||
+          activeCountry.code !== user.country || deposit.country !== activeCountry.code ||
+          deposit.sendavapayToken !== paymentToken) {
         return res.status(400).json({ message: "Paiement ou pays indisponible" });
       }
 
-      const svCountry = toSendavapayCountry(payerCountry);
-      const customerPhone = sendavapayFormatPhone(payerPhone.trim(), payerCountry);
+      const svCountry = toSendavapayCountry(activeCountry.code);
+      const customerPhone = sendavapayFormatPhone(payerPhone.trim(), activeCountry.code, activeCountry.phonePrefix);
 
       const result = await sendavapayInitiate({
         paymentToken,
@@ -1739,7 +1754,7 @@ export async function registerRoutes(
         return res.status(400).json({ message: "Montant invalide" });
       }
       const settingsForWithdrawal = await storage.getSettings();
-      const minWithdrawal = parseInt(settingsForWithdrawal.minWithdrawal || "6120");
+      const minWithdrawal = parseInt(settingsForWithdrawal.minWithdrawal || "1000");
       if (requestedAmount < minWithdrawal) {
         return res.status(400).json({ message: `Montant minimum: ${minWithdrawal} FCFA` });
       }
@@ -2052,7 +2067,7 @@ export async function registerRoutes(
         withdrawalStartHour: parseInt(settings.withdrawalStartHour || "9"),
         withdrawalEndHour: parseInt(settings.withdrawalEndHour || "17"),
         maxWithdrawalsPerDay: parseInt(settings.maxWithdrawalsPerDay || "1"),
-        minWithdrawal: parseInt(settings.minWithdrawal || "6120"),
+        minWithdrawal: parseInt(settings.minWithdrawal || "1000"),
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -2691,10 +2706,7 @@ export async function registerRoutes(
   // Countries routes (public)
   app.get("/api/countries", async (req, res) => {
     try {
-      const activeCountries = await storage.getActiveCountries();
-      res.json(activeCountries.filter((country) =>
-        SUPPORTED_COUNTRY_CODES.includes(country.code as typeof SUPPORTED_COUNTRY_CODES[number]),
-      ));
+      res.json(await storage.getActiveCountries());
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -2744,15 +2756,26 @@ export async function registerRoutes(
     try {
       const { code, name, currency, phonePrefix, operators, isActive } = req.body;
       const normalizedCode = String(code || "").trim().toUpperCase();
-      if (!SUPPORTED_COUNTRY_CODES.includes(normalizedCode as typeof SUPPORTED_COUNTRY_CODES[number])) {
-        return res.status(400).json({ message: "Seuls les pays pris en charge peuvent être ajoutés" });
+      const normalizedName = String(name || "").trim();
+      const normalizedCurrency = String(currency || "").trim().toUpperCase();
+      const normalizedPhonePrefix = String(phonePrefix || "").replace(/\D/g, "");
+      if (!/^[A-Z]{2}$/.test(normalizedCode)) {
+        return res.status(400).json({ message: "Le code pays doit contenir deux lettres ISO" });
       }
-      if (!name || !currency || !phonePrefix || typeof operators !== "string") {
-        return res.status(400).json({ message: "Tous les champs sont requis" });
+      if (!normalizedName || !["XOF", "XAF"].includes(normalizedCurrency) || !/^\d{1,5}$/.test(normalizedPhonePrefix)) {
+        return res.status(400).json({ message: "Nom, devise CFA (XOF/XAF) et indicatif valides requis" });
       }
+      if (isActive !== undefined && typeof isActive !== "boolean") {
+        return res.status(400).json({ message: "Statut pays invalide" });
+      }
+      const normalizedOperators = normalizeCountryOperators(operators);
       const country = await storage.createCountry({
-        code: normalizedCode, name: String(name).trim(), currency: String(currency).trim().toUpperCase(),
-        phonePrefix: String(phonePrefix).replace(/\D/g, ""), operators, isActive: isActive !== false,
+        code: normalizedCode,
+        name: normalizedName,
+        currency: normalizedCurrency,
+        phonePrefix: normalizedPhonePrefix,
+        operators: normalizedOperators,
+        isActive: isActive ?? true,
       });
       res.json(country);
     } catch (error: any) {
@@ -2771,16 +2794,33 @@ export async function registerRoutes(
       const updateData: any = {};
       if (code !== undefined) {
         const normalizedCode = String(code).trim().toUpperCase();
-        if (!SUPPORTED_COUNTRY_CODES.includes(normalizedCode as typeof SUPPORTED_COUNTRY_CODES[number])) {
-          return res.status(400).json({ message: "Code pays non pris en charge" });
+        if (!/^[A-Z]{2}$/.test(normalizedCode)) {
+          return res.status(400).json({ message: "Le code pays doit contenir deux lettres ISO" });
         }
-        updateData.code = normalizedCode;
+        if (normalizedCode !== existing.code) {
+          return res.status(400).json({ message: "Le code pays ne peut pas être modifié après création" });
+        }
       }
-      if (name !== undefined) updateData.name = String(name).trim();
-      if (currency !== undefined) updateData.currency = String(currency).trim().toUpperCase();
-      if (phonePrefix !== undefined) updateData.phonePrefix = String(phonePrefix).replace(/\D/g, "");
-      if (operators !== undefined) updateData.operators = operators;
-      if (isActive !== undefined) updateData.isActive = Boolean(isActive);
+      if (name !== undefined) {
+        const normalizedName = String(name).trim();
+        if (!normalizedName) return res.status(400).json({ message: "Le nom du pays est requis" });
+        updateData.name = normalizedName;
+      }
+      if (currency !== undefined) {
+        const normalizedCurrency = String(currency).trim().toUpperCase();
+        if (!["XOF", "XAF"].includes(normalizedCurrency)) return res.status(400).json({ message: "Seules les devises CFA XOF et XAF sont acceptées" });
+        updateData.currency = normalizedCurrency;
+      }
+      if (phonePrefix !== undefined) {
+        const normalizedPhonePrefix = String(phonePrefix).replace(/\D/g, "");
+        if (!/^\d{1,5}$/.test(normalizedPhonePrefix)) return res.status(400).json({ message: "Indicatif téléphonique invalide" });
+        updateData.phonePrefix = normalizedPhonePrefix;
+      }
+      if (operators !== undefined) updateData.operators = normalizeCountryOperators(operators);
+      if (isActive !== undefined) {
+        if (typeof isActive !== "boolean") return res.status(400).json({ message: "Statut pays invalide" });
+        updateData.isActive = isActive;
+      }
       const country = await storage.updateCountry(id, updateData);
       res.json(country);
     } catch (error: any) {

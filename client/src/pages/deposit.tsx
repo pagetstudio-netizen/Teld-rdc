@@ -10,11 +10,11 @@ import {
 import { Link, useLocation } from "wouter";
 import { COUNTRIES, type ApiCountry } from "@/lib/countries";
 import type { PaymentNumber } from "@shared/schema";
-import rechargeReference from "@assets/images_(76)_1787505744618.jpeg";
+import { spiritsLineup } from "@/lib/suntory-assets";
 
-const TELD_PRIMARY = "#00ABB7";
-const TELD_PRIMARY_DARK = "#008895";
-const TELD_GRADIENT = `linear-gradient(112deg, ${TELD_PRIMARY} 0%, ${TELD_PRIMARY_DARK} 100%)`;
+const SUNTORY_PRIMARY = "#247f91";
+const SUNTORY_PRIMARY_DARK = "#185868";
+const SUNTORY_GRADIENT = `linear-gradient(112deg, ${SUNTORY_PRIMARY} 0%, ${SUNTORY_PRIMARY_DARK} 100%)`;
 
 type Step =
   | "amount"
@@ -91,11 +91,11 @@ export default function DepositPage() {
 
   const country = depositCountry;
 
-  const { data: apiCountries = [] } = useQuery<ApiCountry[]>({
+  const { data: apiCountries } = useQuery<ApiCountry[]>({
     queryKey: ["/api/countries"],
   });
 
-  const countryInfo = apiCountries.length > 0
+  const countryInfo = apiCountries !== undefined
     ? apiCountries.find(c => c.code === country && c.isActive)
     : COUNTRIES.find(c => c.code === country);
   const currency = countryInfo ? "FCFA" : "FCFA";
@@ -103,7 +103,7 @@ export default function DepositPage() {
   const { data: platformSettings, isLoading: platformSettingsLoading } = useQuery<Record<string, string>>({
     queryKey: ["/api/settings"],
   });
-  const MIN_DEPOSIT = parseInt(platformSettings?.minDeposit || "12240");
+  const MIN_DEPOSIT = parseInt(platformSettings?.minDeposit || "3000");
   const sendavapayEnabled = platformSettings?.sendavapayEnabled === "true";
   const sendavapayChannelName = platformSettings?.sendavapayChannelName || "SendavaPay";
   const westpayEnabled = platformSettings?.westpayEnabled === "true";
@@ -119,7 +119,7 @@ export default function DepositPage() {
     ashtechCountriesSetting.split(",").map(c => c.trim().toUpperCase()).includes(country.toUpperCase());
   const ashtechAvailable = ashtechEnabled && ashtechCountryAllowed;
 
-  const activeDepositCountries = (apiCountries.length > 0
+  const activeDepositCountries = (apiCountries !== undefined
     ? apiCountries.filter(c => c.isActive)
     : COUNTRIES
   ) as Array<{ code: string; name: string; currency: string }>;
@@ -809,7 +809,7 @@ export default function DepositPage() {
 
       <div className="deposit-screen">
         <section className="deposit-hero" aria-label="Crédit rapide">
-           <img className="deposit-hero-image" src={rechargeReference} alt="" />
+           <img className="deposit-hero-image" src={spiritsLineup} alt="" />
           <Link href="/account">
              <button type="button" className="hero-hotspot hero-back" aria-label="Retour">
                <ChevronLeft aria-hidden="true" />
@@ -1026,7 +1026,7 @@ export default function DepositPage() {
           onClick={handleSubmit}
           disabled={depositMutation.isPending}
           className="w-full py-5 rounded-full text-white font-bold text-base shadow-lg disabled:opacity-50"
-          style={{ background: TELD_GRADIENT }}
+          style={{ background: SUNTORY_GRADIENT }}
         >
           {depositMutation.isPending ? (
             <span className="flex items-center justify-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Envoi en cours...</span>
@@ -1079,7 +1079,7 @@ export default function DepositPage() {
           onClick={() => wpInitiateMutation.mutate()}
           disabled={wpInitiateMutation.isPending}
           className="w-full py-5 rounded-full text-white font-bold text-base shadow-lg disabled:opacity-40 flex items-center justify-center gap-2"
-          style={{ background: TELD_GRADIENT }}
+          style={{ background: SUNTORY_GRADIENT }}
         >
           {wpInitiateMutation.isPending ? (
             <><Loader2 className="w-5 h-5 animate-spin" /> Redirection en cours...</>
@@ -1143,7 +1143,7 @@ export default function DepositPage() {
           )}
         </div>
         <button onClick={() => ashtechCollectMutation.mutate(undefined)} disabled={!ashtechOperator || !ashtechPhone.trim() || ashtechCollectMutation.isPending}
-          className="w-full py-5 rounded-full text-white font-bold text-base shadow-lg disabled:opacity-40" style={{ background: TELD_GRADIENT }}>
+          className="w-full py-5 rounded-full text-white font-bold text-base shadow-lg disabled:opacity-40" style={{ background: SUNTORY_GRADIENT }}>
           {ashtechCollectMutation.isPending ? <span className="flex items-center justify-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Initiation en cours...</span> : "Initier le paiement"}
         </button>
       </div>
@@ -1169,7 +1169,7 @@ export default function DepositPage() {
         <input type="text" inputMode="numeric" value={ashtechOtp} onChange={(e) => setAshtechOtp(e.target.value)} maxLength={8}
           placeholder="Code OTP reçu par SMS" className="w-full border-2 border-gray-200 rounded-xl px-4 py-4 text-center text-2xl tracking-widest font-black text-gray-800 outline-none bg-white focus:border-[#00CC2C]" />
         <button onClick={() => ashtechCollectMutation.mutate(ashtechOtp)} disabled={!ashtechOtp.trim() || ashtechCollectMutation.isPending}
-          className="w-full py-5 rounded-full text-white font-bold text-base shadow-lg disabled:opacity-40" style={{ background: TELD_GRADIENT }}>
+          className="w-full py-5 rounded-full text-white font-bold text-base shadow-lg disabled:opacity-40" style={{ background: SUNTORY_GRADIENT }}>
           {ashtechCollectMutation.isPending ? <span className="flex items-center justify-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Vérification...</span> : "Valider le code OTP"}
         </button>
       </div>
@@ -1186,7 +1186,7 @@ export default function DepositPage() {
         <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center"><ExternalLink className="w-10 h-10 text-[#00CC2C]" /></div>
         <div><p className="font-bold text-gray-900 text-xl mb-2">Finaliser avec Wave</p><p className="text-sm text-gray-500">Ouvrez la page Wave pour confirmer votre dépôt de <strong>{Number(amount).toLocaleString()} {currency}</strong>.</p></div>
         <a href={ashtechWaveUrl} target="_blank" rel="noopener noreferrer" onClick={() => { setAshtechPolling(true); setStep("ashtech-waiting"); }}
-          className="w-full py-5 rounded-full text-white font-bold text-base shadow-lg flex items-center justify-center gap-2" style={{ background: TELD_GRADIENT }}>
+          className="w-full py-5 rounded-full text-white font-bold text-base shadow-lg flex items-center justify-center gap-2" style={{ background: SUNTORY_GRADIENT }}>
           <ExternalLink className="w-5 h-5" /> Ouvrir Wave
         </a>
       </div>
@@ -1238,7 +1238,7 @@ export default function DepositPage() {
             onChange={(e) => { setSvCountry(e.target.value); setSvOperator(null); }}
             className="w-full border border-gray-300 rounded-md px-4 py-4 text-sm text-gray-700 outline-none bg-white appearance-none"
           >
-            {(apiCountries.length > 0 ? apiCountries.filter(c => c.isActive) : COUNTRIES).map((c: any) => (
+            {(apiCountries !== undefined ? apiCountries.filter(c => c.isActive) : COUNTRIES).map((c: any) => (
               <option key={c.code} value={c.code}>{c.name}</option>
             ))}
           </select>
@@ -1312,7 +1312,7 @@ export default function DepositPage() {
           onClick={() => svInitiateMutation.mutate()}
           disabled={!svOperator || svInitiateMutation.isPending}
           className="w-full py-5 rounded-full text-white font-bold text-base shadow-lg disabled:opacity-40"
-            style={{ background: TELD_GRADIENT }}
+            style={{ background: SUNTORY_GRADIENT }}
         >
           {svInitiateMutation.isPending ? (
             <span className="flex items-center justify-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Initiation en cours...</span>
@@ -1382,7 +1382,7 @@ export default function DepositPage() {
           onClick={() => svOtpMutation.mutate()}
           disabled={!svOtp.trim() || svOtpMutation.isPending}
           className="w-full py-5 rounded-full text-white font-bold text-base shadow-lg disabled:opacity-40"
-          style={{ background: TELD_GRADIENT }}
+          style={{ background: SUNTORY_GRADIENT }}
         >
           {svOtpMutation.isPending ? (
             <span className="flex items-center justify-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Vérification...</span>
@@ -1418,7 +1418,7 @@ export default function DepositPage() {
           target="_blank"
           rel="noopener noreferrer"
           className="w-full py-5 rounded-full text-white font-bold text-base shadow-lg flex items-center justify-center gap-2"
-           style={{ background: TELD_GRADIENT }}
+           style={{ background: SUNTORY_GRADIENT }}
           onClick={() => { setSvPolling(true); setStep("sv-waiting"); }}
         >
           <ExternalLink className="w-5 h-5" /> Ouvrir la page de paiement
@@ -1460,7 +1460,7 @@ export default function DepositPage() {
                   onClick={() => svRetryMutation.mutate()}
                   disabled={svRetryMutation.isPending}
                   className="flex-1 py-3 rounded-full text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
-                   style={{ background: TELD_GRADIENT }}
+                   style={{ background: SUNTORY_GRADIENT }}
                 >
                   {svRetryMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
                   Réessayer

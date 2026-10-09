@@ -13,8 +13,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Edit, Loader2, TrendingUp, Plus, Trash2 } from "lucide-react";
+import { Edit, Loader2, Plus, Trash2 } from "lucide-react";
 import type { Product } from "@shared/schema";
+import { getCompanyProductImage } from "@/lib/product-images";
 
 const productSchema = z.object({
   name: z.string().min(2, "Nom requis"),
@@ -37,12 +38,12 @@ export default function AdminProducts() {
 
   const editForm = useForm<ProductForm>({
     resolver: zodResolver(productSchema),
-    defaultValues: { name: "", price: "", dailyEarnings: "", cycleDays: "80", imageUrl: "" },
+    defaultValues: { name: "", price: "", dailyEarnings: "", cycleDays: "60", imageUrl: "" },
   });
 
   const createForm = useForm<ProductForm>({
     resolver: zodResolver(productSchema),
-    defaultValues: { name: "", price: "", dailyEarnings: "", cycleDays: "80", imageUrl: "" },
+    defaultValues: { name: "", price: "", dailyEarnings: "", cycleDays: "60", imageUrl: "" },
   });
 
   const createMutation = useMutation({
@@ -220,13 +221,7 @@ export default function AdminProducts() {
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  {product.imageUrl ? (
-                    <img src={product.imageUrl} alt={product.name} className="w-12 h-12 rounded-lg object-contain border border-border" />
-                  ) : (
-                    <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
-                      <TrendingUp className="w-6 h-6 text-primary" />
-                    </div>
-                  )}
+                  <img src={product.imageUrl || getCompanyProductImage(product.id - 1)} alt={product.name} className="w-12 h-12 rounded-lg object-contain border border-border" />
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="font-medium text-foreground">{product.name}</p>

@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { FALLBACK_COUNTRIES, type ApiCountry } from "@/lib/countries";
 import { CountrySelector } from "@/components/country-selector";
-import { Eye, EyeOff, Loader2, LockKeyhole, Phone } from "lucide-react";
+import { ChevronDown, Eye, EyeOff, Loader2, LockKeyhole, Phone } from "lucide-react";
 import { AuthLayout } from "@/components/auth-layout";
 
 const loginSchema = z.object({
@@ -49,7 +49,7 @@ export default function LoginPage() {
   }, []);
 
   useEffect(() => {
-    if (!apiCountries || apiCountries.length === 0) return;
+    if (!apiCountries) return;
     const isValid = apiCountries.some(ac => ac.code === selectedCountry && ac.isActive);
     // Keep a remembered/selected country long enough for the server to apply
     // the administrator-only cross-country login rule.
@@ -60,7 +60,7 @@ export default function LoginPage() {
   }, [apiCountries, selectedCountry, form]);
 
   const countryData = (() => {
-    if (apiCountries && apiCountries.length > 0) {
+    if (apiCountries !== undefined) {
       const c = apiCountries.find(ac => ac.code === selectedCountry && ac.isActive);
       if (c) return { phonePrefix: c.phonePrefix, name: c.name };
       return null;
@@ -90,9 +90,10 @@ export default function LoginPage() {
 
         <div className="auth-fields">
           <div className="auth-field">
-            <button type="button" className="auth-prefix" onClick={() => setCountryModalOpen(true)} data-testid="button-select-country" aria-label="Choisir le pays">
+            <button type="button" className="auth-prefix" onClick={() => setCountryModalOpen(true)} data-testid="button-select-country" aria-label={`Choisir le pays${countryData?.name ? ` — ${countryData.name}` : ""}`} aria-expanded={countryModalOpen}>
               <Phone aria-hidden="true" />
               <span>+{displayedPrefix}</span>
+              <ChevronDown className="prefix-chevron" aria-hidden="true" />
             </button>
             <input {...form.register("phone")} type="tel" autoComplete="username" placeholder="Numéro de téléphone" data-testid="input-phone" />
           </div>

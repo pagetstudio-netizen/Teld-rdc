@@ -7,9 +7,8 @@ import { getCountryByCode } from "@/lib/countries";
 import { ChevronLeft, Loader2, Trophy, CheckCircle2 } from "lucide-react";
 import { Link } from "wouter";
 import type { Task } from "@shared/schema";
-import jollibeeImg from "@assets/images_(76)_1787504538939.jpeg";
+import { spiritsCollection, suntoryLogo } from "@/lib/suntory-assets";
 import emptyIllustration from "@assets/illustration-8_1784762965573.png";
-import teldLogo from "@assets/Teld-azul-scaled_1787504539099.png";
 import iconBronze from "@assets/344464_1773318022355.png";
 import iconArgent from "@assets/817729_1773318022328.png";
 import iconOr from "@assets/sac-argent-gros-tas-illustration-icone-argent-comptant-icone-p_1773318022388.jpg";
@@ -83,14 +82,14 @@ export default function TasksPage() {
       {/* Hero Section — tall enough so bottom text clears the stats card overlap */}
       <div className="relative overflow-hidden" style={{ height: "260px" }}>
         <img
-          src={jollibeeImg}
-          alt="TELD (Tcharging)"
+          src={spiritsCollection}
+          alt="Gamme de boissons Suntory"
           className="w-full h-full object-cover object-center"
         />
         {/* Dark gradient overlay */}
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(to bottom, rgba(0,113,197,0.80) 0%, rgba(0,90,158,0.70) 45%, rgba(0,40,100,0.95) 100%)" }}
+          style={{ background: "linear-gradient(to bottom, rgba(21,63,74,0.52) 0%, rgba(21,63,74,0.72) 45%, rgba(21,63,74,0.95) 100%)" }}
         />
 
         {/* Header nav */}
@@ -105,8 +104,8 @@ export default function TasksPage() {
           </Link>
           <div className="flex-1 flex justify-center">
             <div className="flex items-center gap-2">
-              <img src={teldLogo} alt="Logo TELD (Tcharging)" className="h-8 w-8 rounded-md object-cover object-left" />
-              <span className="text-white text-sm font-bold">TELD (Tcharging)</span>
+              <img src={suntoryLogo} alt="Suntory" className="h-7 w-auto max-w-24 rounded-md bg-white px-1 object-contain" />
+              <span className="text-white text-sm font-bold">Suntory</span>
             </div>
           </div>
           <div className="w-9" />
@@ -127,17 +126,17 @@ export default function TasksPage() {
       <div className="mx-4 -mt-10 z-10 relative">
         <div className="bg-white rounded-2xl shadow-lg p-4 flex items-center justify-between">
           <div className="flex-1 text-center border-r border-gray-100">
-            <p className="text-[#FF4500] text-xl font-bold" data-testid="text-total-rewards">
+            <p className="text-[#247f91] text-xl font-bold" data-testid="text-total-rewards">
               {totalTaskRewards.toLocaleString()}
             </p>
             <p className="text-gray-500 text-[11px] mt-0.5">{currency} gagnés</p>
           </div>
           <div className="flex-1 text-center border-r border-gray-100">
-            <p className="text-[#FF4500] text-xl font-bold">{completedCount}</p>
+            <p className="text-[#247f91] text-xl font-bold">{completedCount}</p>
             <p className="text-gray-500 text-[11px] mt-0.5">Terminées</p>
           </div>
           <div className="flex-1 text-center">
-            <p className="text-[#FF4500] text-xl font-bold">{claimableCount}</p>
+            <p className="text-[#247f91] text-xl font-bold">{claimableCount}</p>
             <p className="text-gray-500 text-[11px] mt-0.5">À réclamer</p>
           </div>
         </div>
@@ -147,7 +146,7 @@ export default function TasksPage() {
       <div className="mx-4 mt-4 mb-24">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-[#FF4500]" />
+            <Trophy className="w-4 h-4 text-[#247f91]" />
             <h2 className="text-gray-800 font-bold text-sm">Paliers de parrainage</h2>
           </div>
           {claimableCount > 0 && (
@@ -159,7 +158,7 @@ export default function TasksPage() {
                 }
               }}
               disabled={claimMutation.isPending}
-              className="text-xs text-[#FF4500] font-semibold bg-red-50 px-3 py-1.5 rounded-full"
+              className="text-xs text-[#247f91] font-semibold bg-cyan-50 px-3 py-1.5 rounded-full"
               data-testid="button-claim-rewards"
             >
               Tout réclamer ({claimableCount})
@@ -188,7 +187,7 @@ export default function TasksPage() {
                     task.isCompleted
                       ? "border-green-200"
                       : task.canClaim
-                      ? "border-[#FF4500]/40"
+                      ? "border-[#247f91]/40"
                       : "border-gray-100"
                   }`}
                   data-testid={`task-item-${task.id}`}
@@ -213,7 +212,7 @@ export default function TasksPage() {
                         <span className="font-bold text-gray-900">{task.requiredInvites}</span>{" "}
                         personnes à recharger
                       </p>
-                      <p className="text-[#FF4500] font-bold text-base">
+                      <p className="text-[#247f91] font-bold text-base">
                         {task.reward.toLocaleString()} {currency}
                       </p>
 
@@ -228,7 +227,7 @@ export default function TasksPage() {
                         <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-all duration-500 ${
-                              task.isCompleted ? "bg-green-500" : "bg-[#FF4500]"
+                            task.isCompleted ? "bg-green-500" : "bg-[#247f91]"
                             }`}
                             style={{ width: `${progress}%` }}
                           />
@@ -246,7 +245,7 @@ export default function TasksPage() {
                         <button
                           onClick={() => !claimMutation.isPending && claimMutation.mutate(task.id)}
                           disabled={claimMutation.isPending}
-                          className="bg-[#FF4500] text-white text-[11px] font-semibold px-3 py-1.5 rounded-full active:scale-95 transition-transform shadow-sm"
+                          className="bg-[#247f91] text-white text-[11px] font-semibold px-3 py-1.5 rounded-full active:scale-95 transition-transform shadow-sm"
                           data-testid={`button-claim-${task.id}`}
                         >
                           {claimMutation.isPending ? (

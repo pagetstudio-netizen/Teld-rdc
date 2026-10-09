@@ -87,6 +87,7 @@ export function formatMsisdn(phone: string, countryCode: string): string {
 export function buildPaymentUrl(params: {
   amount: number;
   countryCode: string;
+  countryName?: string;
   redirectUrl: string;
 }): string {
   const slug = getMerchantSlug();
@@ -94,7 +95,7 @@ export function buildPaymentUrl(params: {
   const url = new URL(`${WESTPAY_BASE}/pay`);
   url.searchParams.set("merchant", slug);
   url.searchParams.set("amount", String(params.amount));
-  url.searchParams.set("country", getCountryName(params.countryCode));
+  url.searchParams.set("country", WESTPAY_COUNTRY_NAMES[params.countryCode] || params.countryName || params.countryCode);
   url.searchParams.set("redirect", params.redirectUrl);
   return url.toString();
 }

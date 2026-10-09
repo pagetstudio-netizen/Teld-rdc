@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, HelpCircle, Users } from "lucide-react";
 import { getCountryByCode } from "@/lib/countries";
 
-import globeImg from "@assets/images_(74)_1787504539004.jpeg";
+import { spiritsLineup } from "@/lib/suntory-assets";
 
 export default function RewardsPage() {
   const { user } = useAuth();
@@ -63,7 +63,7 @@ export default function RewardsPage() {
           <h1 className="text-xl font-bold text-gray-900 mb-4">Recevoir</h1>
 
           <div className="relative rounded-2xl overflow-hidden" style={{ backgroundColor: "#2196F3" }}>
-            <img src={globeImg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-20" />
+            <img src={spiritsLineup} alt="" className="absolute inset-0 w-full h-full object-cover opacity-20" />
             <div className="relative z-10 flex items-center justify-between px-5 py-5">
               <div>
                 <p className="text-white/80 text-sm">{currency}</p>
@@ -98,7 +98,7 @@ export default function RewardsPage() {
                   data-testid={`task-item-${task.id}`}
                 >
                   <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: "#e3f2fd" }}>
-                    <Users className="w-5 h-5" style={{ color: "var(--teld-primary)" }} />
+                    <Users className="w-5 h-5" style={{ color: "var(--suntory-primary)" }} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800 truncate">{task.description}</p>

@@ -1,5 +1,6 @@
 import { ChevronLeft } from "lucide-react";
 import { Link } from "wouter";
+import { spiritsCollection, suntoryLogo } from "@/lib/suntory-assets";
 
 export default function AboutPage() {
   return (
@@ -17,21 +18,19 @@ export default function AboutPage() {
 
       {/* Body */}
       <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5" style={{ color: "#d4d4d4", fontSize: 13.5, lineHeight: "1.75" }}>
+        <img src={suntoryLogo} alt="Logo Suntory" className="mx-auto w-52 rounded-lg bg-white p-4" />
+        <img src={spiritsCollection} alt="Sélection de boissons du Groupe Suntory" className="w-full rounded-lg object-cover" />
 
         <p>
-          TELD (Tcharging) est un leader incontournable qui possède l'un des plus grands réseaux de bornes connectées à travers le pays.
+          Fondé en 1899 à Osaka, au Japon, par Shinjiro Torii, le Groupe Suntory a d’abord développé le premier whisky japonais.
         </p>
 
         <p>
-          TELD (Tcharging) développe des solutions de recharge connectées accessibles aux particuliers comme aux professionnels.
+          Aujourd’hui, Suntory Holdings rassemble des activités internationales dans les boissons alcoolisées, les boissons sans alcool et les produits de santé.
         </p>
 
         <p>
-          Notre collection s’adapte aux espaces intérieurs comme extérieurs : sols, murs, terrasses, salles de bains et pièces de vie.
-        </p>
-
-        <p>
-          La disponibilité du réseau, la simplicité d'utilisation et la satisfaction des utilisateurs sont au cœur de l'engagement de TELD (Tcharging).
+          Suntory est présent dans de nombreux marchés à travers le monde, avec un portefeuille diversifié de boissons et de produits.
         </p>
 
       </div>

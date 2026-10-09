@@ -136,7 +136,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 }
 
 function BrandThemeScope({ children }: { children: React.ReactNode }) {
-  return <div className="teld-theme">{children}</div>;
+  return <div className="suntory-theme">{children}</div>;
 }
 
 function Router() {

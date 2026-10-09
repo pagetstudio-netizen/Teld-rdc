@@ -20,13 +20,13 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { ADMIN_PATH } from "@/lib/admin-path";
-import teldLogo from "@assets/Teld-azul-scaled_1787507180057.png";
+import { suntoryLogo } from "@/lib/suntory-assets";
 import serviceRepresentative from "@assets/20260822_083355_1787387728003.png";
 import rechargeButtonImage from "@assets/20260124_173540_1787507650481.png";
 import withdrawButtonImage from "@assets/20260124_173432_1787507650509.png";
 
-const accent = "#00ABB7";
-const accentDark = "#007E95";
+const accent = "#247f91";
+const accentDark = "#185868";
 
 type AccountMenuItem = {
   label: string;
@@ -396,7 +396,7 @@ export default function AccountPage() {
       <div className="account-screen">
         <section className="account-top" aria-label="Informations du compte">
           <header className="profile-header">
-            <img className="profile-logo" src={teldLogo} alt="TELD" />
+            <img className="profile-logo" src={suntoryLogo} alt="Suntory" />
             <div className="profile-details">
               <p className="profile-name">{displayName}</p>
               <span className="profile-id">ID:{user.id}</span>
@@ -486,7 +486,7 @@ export default function AccountPage() {
                 verifyPinMutation.mutate(adminPin);
               }}
               disabled={verifyPinMutation.isPending || adminPin.length < 4}
-               className="w-full bg-[#00ABB7] hover:bg-[#007E95]"
+               className="w-full bg-[#247f91] hover:bg-[#185868]"
               data-testid="button-verify-pin"
             >
               {verifyPinMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

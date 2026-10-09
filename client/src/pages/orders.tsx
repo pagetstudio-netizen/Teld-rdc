@@ -95,7 +95,7 @@ export default function OrdersPage() {
                       <img 
                         src={getProductImage(up.productId ? up.productId % productImages.length : index)} 
                         alt={formatCompanyProductName(up.product?.name, up.productId)}
-                        className="w-full h-full object-cover rounded-lg"
+                        className="w-full h-full rounded-lg bg-[#f7fbfc] object-contain"
                       />
                     </div>
 

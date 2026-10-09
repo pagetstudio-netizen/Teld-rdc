@@ -7,7 +7,7 @@ import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
 import nodataImg from "@assets/nodata-da225bbb_(1)_1783249133513.png";
-import teldLogo from "@assets/Teld-azul-scaled_1787505809423.png";
+import { suntoryLogo } from "@/lib/suntory-assets";
 
 interface Deposit {
   id: number;
@@ -44,7 +44,7 @@ interface Transaction {
 
 type ActiveTab = "balance" | "deposits" | "withdrawals";
 
-const CARD_GREEN = "#00ABB7";
+const CARD_GREEN = "#247f91";
 const CARD_BACKGROUND = "#f8f8ff";
 
 const makeRef = (prefix: "D" | "W", id: number, date: string | Date) => {
@@ -270,7 +270,7 @@ export default function HistoryPage() {
         }
         .history-title {
           margin: 0;
-          color: #008895;
+          color: #185868;
           font-size: 21px;
           font-weight: 400;
           line-height: 1.15;
@@ -306,7 +306,7 @@ export default function HistoryPage() {
           white-space: nowrap;
         }
         .history-tab.active {
-          color: #008895;
+          color: #185868;
           font-weight: 700;
         }
         .history-tab.active::after {
@@ -318,7 +318,7 @@ export default function HistoryPage() {
           height: 3px;
           margin: auto;
           border-radius: 2px 2px 0 0;
-          background: #00ABB7;
+          background: #247f91;
           content: "";
         }
         .history-tab-arrow { display: none; }
@@ -351,7 +351,7 @@ export default function HistoryPage() {
         .credit-copy { min-width: 0; }
         .credit-title {
           margin: 0;
-          color: #008895;
+          color: #185868;
           font-size: 20px;
           font-weight: 400;
           line-height: 1.2;
@@ -366,7 +366,7 @@ export default function HistoryPage() {
         .credit-amount {
           flex: 0 0 auto;
           margin: 0;
-          color: #008895;
+          color: #185868;
           font-size: 20px;
           font-weight: 400;
           line-height: 1;
@@ -482,7 +482,7 @@ export default function HistoryPage() {
               <ChevronLeft aria-hidden="true" />
             </button>
           </Link>
-          <img className="history-brand" src={teldLogo} alt="TELD (Tcharging)" />
+          <img className="history-brand" src={suntoryLogo} alt="Suntory" />
           <h1 className="history-title">Détails du solde</h1>
         </header>
 

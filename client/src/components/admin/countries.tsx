@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Pencil, Globe } from "lucide-react";
+import { Pencil, Globe, Plus } from "lucide-react";
 import type { Country } from "@shared/schema";
 
 interface CountryForm {
@@ -22,10 +22,10 @@ interface CountryForm {
 }
 
 const emptyForm: CountryForm = {
-  code: "TG",
-  name: "Togo",
+  code: "",
+  name: "",
   currency: "XOF",
-  phonePrefix: "228",
+  phonePrefix: "",
   operators: "",
   isActive: true,
 };
@@ -71,6 +71,27 @@ export default function AdminCountries() {
     },
   });
 
+  const statusMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
+      const res = await apiRequest("PUT", `/api/admin/countries/${id}`, { isActive });
+      if (!res.ok) throw new Error((await res.json()).message);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/countries"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/countries"] });
+    },
+    onError: (e: any) => {
+      toast({ title: "Erreur", description: e.message, variant: "destructive" });
+    },
+  });
+
+  const openCreate = () => {
+    setForm(emptyForm);
+    setEditingId(null);
+    setDialogOpen(true);
+  };
+
   const openEdit = (c: Country) => {
     let operatorsStr = "";
     try { operatorsStr = JSON.parse(c.operators).join(", "); } catch {}
@@ -98,6 +119,10 @@ export default function AdminCountries() {
           <Globe className="w-5 h-5" />
           Pays et opérateurs
         </h2>
+        <Button onClick={openCreate} data-testid="button-add-country">
+          <Plus className="w-4 h-4 mr-2" />
+          Ajouter un pays
+        </Button>
       </div>
 
       {isLoading && <p className="text-muted-foreground text-sm">Chargement...</p>}
@@ -115,6 +140,9 @@ export default function AdminCountries() {
                       <span className="font-semibold text-base">{c.name}</span>
                       <Badge variant="outline" className="text-xs">{c.code}</Badge>
                       <Badge variant="secondary" className="text-xs">{c.currency}</Badge>
+                      <Badge variant={c.isActive ? "default" : "secondary"} className="text-xs">
+                        {c.isActive ? "Actif" : "Inactif"}
+                      </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground mb-1">
                       Indicatif: +{c.phonePrefix}
@@ -128,6 +156,12 @@ export default function AdminCountries() {
                     )}
                   </div>
                   <div className="flex items-center gap-2">
+                    <Switch
+                      checked={c.isActive}
+                      onCheckedChange={(isActive) => statusMutation.mutate({ id: c.id, isActive })}
+                      aria-label={`${c.isActive ? "Désactiver" : "Activer"} ${c.name}`}
+                      data-testid={`switch-country-active-${c.id}`}
+                    />
                     <Button size="icon" variant="ghost" onClick={() => openEdit(c)} data-testid={`button-edit-country-${c.id}`}>
                       <Pencil className="w-4 h-4" />
                     </Button>
@@ -146,17 +180,18 @@ export default function AdminCountries() {
       <Dialog open={dialogOpen} onOpenChange={(v) => { if (!v) { setDialogOpen(false); setEditingId(null); setForm(emptyForm); }}}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Modifier le pays et ses opérateurs</DialogTitle>
+            <DialogTitle>{editingId ? "Modifier le pays et ses opérateurs" : "Ajouter un pays"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Code pays (ex: TD)</Label>
+                <Label>Code pays ISO (2 lettres)</Label>
                 <Input
                   value={form.code}
                   placeholder="TG"
-                  maxLength={3}
-                  disabled
+                  maxLength={2}
+                  disabled={editingId !== null}
+                  onChange={e => setForm({ ...form, code: e.target.value.toUpperCase() })}
                   required
                   data-testid="input-country-code"
                 />
@@ -166,8 +201,9 @@ export default function AdminCountries() {
                 <Input
                   value={form.currency}
                   placeholder="XOF"
-                  maxLength={5}
-                  disabled
+                  maxLength={3}
+                  onChange={e => setForm({ ...form, currency: e.target.value.toUpperCase() })}
+                  required
                   data-testid="input-country-currency"
                 />
               </div>
@@ -176,8 +212,9 @@ export default function AdminCountries() {
               <Label>Nom du pays</Label>
               <Input
                 value={form.name}
-                placeholder="Togo"
-                disabled
+                placeholder="Nom du pays"
+                onChange={e => setForm({ ...form, name: e.target.value })}
+                required
                 data-testid="input-country-name"
               />
             </div>
@@ -186,7 +223,8 @@ export default function AdminCountries() {
               <Input
                 value={form.phonePrefix}
                 placeholder="228"
-                disabled
+                onChange={e => setForm({ ...form, phonePrefix: e.target.value.replace(/\D/g, "") })}
+                required
                 data-testid="input-country-prefix"
               />
             </div>
@@ -199,6 +237,14 @@ export default function AdminCountries() {
                 data-testid="input-country-operators"
               />
               <p className="text-xs text-muted-foreground mt-1">Ces opérateurs contrôlent les comptes mobiles et numéros de paiement de ce pays.</p>
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="country-active">Pays actif</Label>
+              <Switch
+                id="country-active"
+                checked={form.isActive}
+                onCheckedChange={isActive => setForm({ ...form, isActive })}
+              />
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => { setDialogOpen(false); setEditingId(null); setForm(emptyForm); }}>

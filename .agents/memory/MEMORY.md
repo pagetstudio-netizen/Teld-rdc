@@ -1,4 +1,4 @@
-- [TELD (Tcharging) identity](vestas-platform.md) — Brand, charging-network positioning and official #00ABB7 interface palette.
+- [Suntory brand and imagery](suntory-brand.md) — Officially authorized platform identity, company description and supplied-image licensing boundary.
 - [WestPay Integration](westpay-integration.md) — Redirect-based deposit flow + HMAC webhook; per-country API keys for withdrawals; secrets only (never in code/DB).
 - [WestPay payment correlation](westpay-payment-correlation.md) — Automatic credits need a signed order and amount, not a browser-provided transaction reference.
 - [SendavaPay integration](sendavapay-integration.md) — Payin deposit flow: backend creates+initiates, user phone auto-used, OTP/redirect handled, webhook HMAC verified.

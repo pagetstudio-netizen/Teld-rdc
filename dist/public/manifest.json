@@ -1,21 +1,21 @@
 {
-  "name": "TELD (Tcharging)",
-  "short_name": "TELD",
-  "description": "TELD (Tcharging) est un leader incontournable qui possède l'un des plus grands réseaux de bornes connectées à travers le pays.",
+  "name": "Suntory",
+  "short_name": "Suntory",
+  "description": "Groupe mondial de boissons alcoolisées et sans alcool, ainsi que de produits de santé, fondé à Osaka en 1899.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#00ABB7",
+  "theme_color": "#5CBFD0",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/favicon.png?v=teld",
+      "src": "/brand/suntory-icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/favicon.png?v=teld",
+      "src": "/brand/suntory-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

@@ -46,14 +46,14 @@ export default function BottomNav() {
                 aria-hidden="true"
                 className="bottom-nav-icon h-[32px] w-[32px]"
                 style={{
-                  backgroundColor: isActive ? "#00ABB7" : "#8f969b",
+                  backgroundColor: isActive ? "#247f91" : "#8f969b",
                   WebkitMaskImage: `url("${item.icon}")`,
                   maskImage: `url("${item.icon}")`,
                 }}
               />
               <span
                 className="text-[11px] font-medium leading-none"
-                style={{ color: isActive ? "#00ABB7" : "#55565a" }}
+                style={{ color: isActive ? "#247f91" : "#55565a" }}
               >
                 {item.label}
               </span>

@@ -55,7 +55,7 @@ async function handleTelegramCommand(text: string, chatId: string) {
   const command = text.trim().split(/\s+/)[0].toLowerCase().split("@")[0];
   if (command === "/help" || command === "/start") {
     return [
-      "🤖 <b>Commandes TELD (Tcharging)</b>",
+      "🤖 <b>Commandes Suntory</b>",
       "/stats — statistiques de la plateforme",
       "/solde — soldes et montants en attente",
       "/pending — dépôts et retraits en attente",
@@ -69,8 +69,8 @@ async function handleTelegramCommand(text: string, chatId: string) {
       `Utilisateurs : ${formatTelegramValue(stats.totalUsers)}`,
       `Nouveaux aujourd'hui : ${formatTelegramValue(stats.todayUsers)}`,
       `Utilisateurs avec produit : ${formatTelegramValue(stats.usersWithProducts)}`,
-      `Dépôts approuvés : ${formatTelegramValue(stats.totalDeposits)} CDF`,
-      `Retraits approuvés : ${formatTelegramValue(stats.totalWithdrawals)} CDF`,
+      `Dépôts approuvés : ${formatTelegramValue(stats.totalDeposits)} FCFA`,
+      `Retraits approuvés : ${formatTelegramValue(stats.totalWithdrawals)} FCFA`,
     ].join("\n");
   }
   if (command === "/solde") {
@@ -87,10 +87,10 @@ async function handleTelegramCommand(text: string, chatId: string) {
       storage.getWithdrawals("pending"),
     ]);
     const depositLines = deposits.slice(0, 10).map((item) =>
-      `• Dépôt #${item.id} — ${item.amount} CDF — ${item.user?.fullName || "Utilisateur"}`,
+      `• Dépôt #${item.id} — ${item.amount} FCFA — ${item.user?.fullName || "Utilisateur"}`,
     );
     const withdrawalLines = withdrawals.slice(0, 10).map((item) =>
-      `• Retrait #${item.id} — ${item.amount} CDF — ${item.user?.fullName || "Utilisateur"}`,
+      `• Retrait #${item.id} — ${item.amount} FCFA — ${item.user?.fullName || "Utilisateur"}`,
     );
     return [
       "⏳ <b>Opérations en attente</b>",
@@ -111,15 +111,15 @@ export async function sendDailyTelegramSummary(): Promise<void> {
     `Utilisateurs : ${formatTelegramValue(stats.totalUsers)}`,
     `Nouveaux utilisateurs : ${formatTelegramValue(stats.todayUsers)}`,
     `Utilisateurs avec produit : ${formatTelegramValue(stats.usersWithProducts)}`,
-    `Solde total : ${formatTelegramValue(stats.totalBalance)} CDF`,
-    `Revenus totaux : ${formatTelegramValue(stats.totalEarnings)} CDF`,
-    `Commissions : ${formatTelegramValue(stats.totalCommissions)} CDF`,
-    `Dépôts du jour : ${formatTelegramValue(stats.todayDeposits)} CDF`,
-    `Dépôts cumulés : ${formatTelegramValue(stats.totalDeposits)} CDF`,
-    `Retraits du jour : ${formatTelegramValue(stats.todayWithdrawals)} CDF`,
-    `Retraits cumulés : ${formatTelegramValue(stats.totalWithdrawals)} CDF`,
-    `Dépôts en attente : ${formatTelegramValue(stats.pendingDeposits)} CDF (${formatTelegramValue(stats.pendingDepositsCount)})`,
-    `Retraits en attente : ${formatTelegramValue(stats.pendingWithdrawals)} CDF (${formatTelegramValue(stats.pendingWithdrawalsCount)})`,
+    `Solde total : ${formatTelegramValue(stats.totalBalance)} FCFA`,
+    `Revenus totaux : ${formatTelegramValue(stats.totalEarnings)} FCFA`,
+    `Commissions : ${formatTelegramValue(stats.totalCommissions)} FCFA`,
+    `Dépôts du jour : ${formatTelegramValue(stats.todayDeposits)} FCFA`,
+    `Dépôts cumulés : ${formatTelegramValue(stats.totalDeposits)} FCFA`,
+    `Retraits du jour : ${formatTelegramValue(stats.todayWithdrawals)} FCFA`,
+    `Retraits cumulés : ${formatTelegramValue(stats.totalWithdrawals)} FCFA`,
+    `Dépôts en attente : ${formatTelegramValue(stats.pendingDeposits)} FCFA (${formatTelegramValue(stats.pendingDepositsCount)})`,
+    `Retraits en attente : ${formatTelegramValue(stats.pendingWithdrawals)} FCFA (${formatTelegramValue(stats.pendingWithdrawalsCount)})`,
   ].join("\n"));
 }
 

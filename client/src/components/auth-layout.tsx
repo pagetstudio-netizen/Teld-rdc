@@ -1,8 +1,7 @@
 import { Globe2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useLocation } from "wouter";
-import teldLogo from "@assets/Teld-azul-scaled_1787507180057.png";
-import teldBackground from "@assets/Teld-Faria-Lima-768x512_1787504539073.jpg";
+import { productionFloor, suntoryLogo } from "@/lib/suntory-assets";
 
 export type AuthMode = "login" | "register";
 
@@ -19,14 +18,14 @@ export function AuthLayout({ mode, children, showLanguage = false }: AuthLayoutP
     <main className={`auth-reference auth-${mode}`}>
       <style>{`
         .auth-reference {
-          --auth-blue: #438fdc;
-          --auth-purple: #9b1bb7;
-          --auth-purple-dark: #84169d;
+          --auth-blue: #e7f5f8;
+          --auth-purple: #247f91;
+          --auth-purple-dark: #185868;
           width: 100%;
           min-height: 100dvh;
           overflow-x: hidden;
           background: var(--auth-blue);
-          color: #202020;
+          color: #173c48;
           font-family: Arial, Helvetica, sans-serif;
         }
         .auth-reference *,
@@ -83,26 +82,20 @@ export function AuthLayout({ mode, children, showLanguage = false }: AuthLayoutP
         }
         .auth-reference .auth-logo-card {
           display: grid;
-          width: 132px;
-          height: 132px;
+          width: 232px;
+          height: 68px;
           place-items: center;
           overflow: hidden;
-          border-radius: 13px;
-          background: rgba(239, 239, 239, .92);
-          box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+          border-radius: 8px;
+          background: #fff;
+          box-shadow: 0 2px 6px rgba(24, 88, 104, .1);
         }
         .auth-reference .auth-logo-card img {
           display: block;
-          width: 116px;
-          height: auto;
+          width: 218px;
+          max-width: calc(100% - 12px);
+          height: 60px;
           object-fit: contain;
-        }
-        .auth-reference .auth-brand-name {
-          margin: 16px 0 0;
-          color: #234d72;
-          font-size: 28px;
-          font-weight: 700;
-          line-height: 1;
         }
         .auth-reference .auth-mode-switch {
           display: grid;
@@ -152,11 +145,11 @@ export function AuthLayout({ mode, children, showLanguage = false }: AuthLayoutP
           height: 64px;
           align-items: center;
           overflow: hidden;
-          border: 1px solid #a91db9;
+          border: 1px solid #247f91;
           border-radius: 33px;
           padding: 0 16px;
           background: #fff;
-          box-shadow: 0 1px 4px rgba(80, 0, 100, .12);
+          box-shadow: 0 1px 4px rgba(36, 127, 145, .12);
         }
         .auth-reference .auth-field-icon {
           width: 28px;
@@ -230,7 +223,7 @@ export function AuthLayout({ mode, children, showLanguage = false }: AuthLayoutP
         }
         .auth-reference .auth-error {
           margin: -24px 0 -7px 14px;
-          color: #fff;
+          color: #9f1c2d;
           font-size: 12px;
           line-height: 1.2;
         }
@@ -246,7 +239,7 @@ export function AuthLayout({ mode, children, showLanguage = false }: AuthLayoutP
           font-size: clamp(19px, 4.5vw, 23px);
           font-weight: 700;
           line-height: 1;
-          box-shadow: 0 2px 5px rgba(85, 0, 120, .2);
+          box-shadow: 0 2px 5px rgba(36, 127, 145, .24);
           transition: transform .12s ease, background-color .12s ease;
         }
         .auth-reference .auth-submit:disabled {
@@ -260,8 +253,8 @@ export function AuthLayout({ mode, children, showLanguage = false }: AuthLayoutP
           z-index: 0;
           height: 185px;
           background-image:
-            linear-gradient(180deg, rgba(67, 143, 220, .2), rgba(67, 143, 220, .12)),
-            url("${teldBackground}");
+            linear-gradient(180deg, rgba(24, 88, 104, .2), rgba(24, 88, 104, .12)),
+            url("${productionFloor}");
           background-position: center 58%;
           background-size: cover;
           opacity: .35;
@@ -271,7 +264,7 @@ export function AuthLayout({ mode, children, showLanguage = false }: AuthLayoutP
           padding-top: 82px;
         }
         .auth-login .auth-mode-switch {
-          margin-top: clamp(58px, 16vw, 84px);
+          margin-top: clamp(110px, 29vw, 116px);
         }
         .auth-login .auth-form {
           margin-top: 32px;
@@ -320,11 +313,11 @@ export function AuthLayout({ mode, children, showLanguage = false }: AuthLayoutP
             height: 64px;
           }
           .auth-reference .auth-logo-card {
-            width: 122px;
-            height: 122px;
+            width: min(232px, calc(100vw - 48px));
+            height: 68px;
           }
           .auth-reference .auth-logo-card img {
-            width: 108px;
+            width: 218px;
           }
           .auth-login .auth-panel {
             padding-top: 70px;
@@ -333,7 +326,7 @@ export function AuthLayout({ mode, children, showLanguage = false }: AuthLayoutP
             padding-top: 20px;
           }
           .auth-login .auth-mode-switch {
-            margin-top: 58px;
+            margin-top: 110px;
           }
           .auth-register .auth-mode-switch {
             margin-top: 54px;
@@ -354,9 +347,8 @@ export function AuthLayout({ mode, children, showLanguage = false }: AuthLayoutP
 
           <div className="auth-identity">
             <div className="auth-logo-card">
-              <img src={teldLogo} alt="TELD (Tcharging)" />
+              <img src={suntoryLogo} alt="Suntory" />
             </div>
-            <p className="auth-brand-name">TELD</p>
           </div>
 
           <nav className="auth-mode-switch" aria-label="Type d'authentification">

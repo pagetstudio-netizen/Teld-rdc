@@ -89,7 +89,7 @@ export default function SalaryBonusPage() {
               <div className="flex-1 px-4 py-4">
                 <p className="text-gray-700 text-xs text-center leading-snug mb-3">
                   Invitez <span className="font-bold text-gray-900">{required}</span> investisseurs de niveau 1 pour obtenir :{" "}
-                  <span className="font-bold" style={{ color: "var(--teld-primary)" }}>{currency} {reward.toLocaleString()}</span>
+                  <span className="font-bold" style={{ color: "var(--suntory-primary)" }}>{currency} {reward.toLocaleString()}</span>
                 </p>
 
                 {/* Stats row */}

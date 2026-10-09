@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import giftHero from "@assets/images_(75)_1787504538978.jpeg";
+import { spiritsLineup } from "@/lib/suntory-assets";
 import telegramIcon from "@assets/tg-1_1787390593655.png";
 
 export default function GiftCodePage() {
@@ -51,7 +51,7 @@ export default function GiftCodePage() {
         .gift-reference .gift-screen { width: 100%; max-width: 512px; min-height: 100dvh; margin: 0 auto; background: #f3f3f3; }
         .gift-reference .gift-title { height: 80px; display: flex; align-items: center; padding: 0 38px; background: #fff; border-bottom: 1px solid #ddd; }
         .gift-reference .gift-title a { color: #37434b; font-size: 38px; line-height: 1; text-decoration: none; }
-         .gift-reference .gift-title h1 { flex: 1; margin: 0; color: #00ABB7; font-size: 21px; font-weight: 700; text-align: center; }
+         .gift-reference .gift-title h1 { flex: 1; margin: 0; color: #185868; font-size: 21px; font-weight: 700; text-align: center; }
         .gift-reference .gift-hero { display: block; width: 100%; height: auto; aspect-ratio: 461 / 292; object-fit: cover; }
         .gift-reference .gift-description { height: 58px; display: flex; align-items: center; padding: 0 21px; background: #f8f8f8; color: #555; font-size: 17px; }
         .gift-reference .gift-telegram { height: 93px; display: flex; align-items: center; padding: 0 21px; background: #fff; border-bottom: 1px solid #eee; text-decoration: none; }
@@ -60,10 +60,10 @@ export default function GiftCodePage() {
         .gift-reference .gift-telegram svg { width: 22px; height: 22px; color: #aaa; stroke-width: 2; }
         .gift-reference .gift-form { padding: 29px 21px 0; }
         .gift-reference .gift-label { display: block; margin-bottom: 17px; color: #151515; font-size: 19px; font-weight: 700; }
-         .gift-reference .gift-label::first-letter { color: #00ABB7; }
+         .gift-reference .gift-label::first-letter { color: #247f91; }
         .gift-reference .gift-input { display: block; width: 100%; height: 67px; border: 0; border-radius: 8px; padding: 0 21px; outline: 0; background: #e9e9eb; color: #333; font-size: 16px; }
         .gift-reference .gift-input::placeholder { color: #a6a9b3; opacity: 1; }
-         .gift-reference .gift-submit { display: block; width: calc(100% - 42px); height: 69px; margin: 37px auto 0; border: 0; border-radius: 36px; background: #00ABB7; color: white; font-size: 21px; font-weight: 700; box-shadow: 0 8px 18px rgba(0, 171, 183, .2); }
+         .gift-reference .gift-submit { display: block; width: calc(100% - 42px); height: 69px; margin: 37px auto 0; border: 0; border-radius: 36px; background: #247f91; color: white; font-size: 21px; font-weight: 700; box-shadow: 0 8px 18px rgba(36, 127, 145, .2); }
         .gift-reference .gift-submit:active { transform: scale(.98); }
         .gift-reference .gift-submit:disabled { opacity: .7; }
         @media (max-width: 370px) {
@@ -76,7 +76,7 @@ export default function GiftCodePage() {
           <Link href="/account" aria-label="Retour">‹</Link>
           <h1>Échanger un cadeau</h1>
         </header>
-        <img className="gift-hero" src={giftHero} alt="Borne de recharge TELD" data-testid="img-gift-banner" />
+        <img className="gift-hero" src={spiritsLineup} alt="Sélection de boissons Suntory" data-testid="img-gift-banner" />
         <p className="gift-description">Vous pouvez obtenir un code cadeau dans le groupe</p>
         <a className="gift-telegram" href={settings?.groupLink || "https://t.me/sybotx"} target="_blank" rel="noreferrer">
           <img src={telegramIcon} alt="" />

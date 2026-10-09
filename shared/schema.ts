@@ -343,9 +343,10 @@ export const phoneNumberSchema = z.string()
   .trim()
   .regex(/^\+?[0-9]{8,15}$/, "Numéro de téléphone invalide");
 
-export const supportedCountryCodeSchema = z.enum(["TG", "BJ", "BF", "CI", "CM"], {
-  errorMap: () => ({ message: "Pays non pris en charge" }),
-});
+export const supportedCountryCodeSchema = z.string()
+  .trim()
+  .regex(/^[A-Za-z]{2}$/, "Code pays invalide")
+  .transform((code) => code.toUpperCase());
 
 export const registerSchema = z.object({
   fullName: z.string().trim().min(2, "Le nom complet est requis").max(100, "Nom trop long"),

@@ -315,9 +315,9 @@ async function run() {
 
     // ── Seed platform settings ──
     const settings = [
-      ["minDeposit", "4000"], ["minWithdrawal", "1500"], ["withdrawalFees", "18"],
+      ["minDeposit", "3000"], ["minWithdrawal", "1000"], ["withdrawalFees", "18"],
       ["withdrawalStartHour", "9"], ["withdrawalEndHour", "17"], ["maxWithdrawalsPerDay", "1"],
-      ["level1Commission", "15"], ["level2Commission", "2"], ["level3Commission", "1"],
+      ["level1Commission", "20"], ["level2Commission", "5"], ["level3Commission", "2"],
       ["signupBonus", "500"], ["soleaspayEnabled", "false"], ["soleaspayCountries", ""],
       ["soleaspayChannelName", "Westpay"], ["omnipayEnabled", "false"],
       ["omnipayChannelName", "OmniPay"], ["omnipayCallbackKey", ""],
@@ -335,25 +335,45 @@ async function run() {
     }
     console.log("✅ Paramètres plateforme insérés");
 
-    // ── Seed products ──
-    const productsData = [
-      { name: "Bonus Gratuit", price: 0, daily_earnings: 50, cycle_days: 80, total_return: 4000, is_free: true, sort_order: 0 },
-      { name: "VIP 1", price: 4000, daily_earnings: 200, cycle_days: 80, total_return: 16000, is_free: false, sort_order: 1 },
-      { name: "VIP 2", price: 10000, daily_earnings: 550, cycle_days: 80, total_return: 44000, is_free: false, sort_order: 2 },
-      { name: "VIP 3", price: 30000, daily_earnings: 1700, cycle_days: 80, total_return: 136000, is_free: false, sort_order: 3 },
-      { name: "VIP 4", price: 60000, daily_earnings: 3500, cycle_days: 80, total_return: 280000, is_free: false, sort_order: 4 },
-      { name: "VIP 5", price: 100000, daily_earnings: 6000, cycle_days: 80, total_return: 480000, is_free: false, sort_order: 5 },
-      { name: "VIP 6", price: 200000, daily_earnings: 13000, cycle_days: 80, total_return: 1040000, is_free: false, sort_order: 6 },
-      { name: "VIP 7", price: 500000, daily_earnings: 35000, cycle_days: 80, total_return: 2800000, is_free: false, sort_order: 7 },
-    ];
-    for (const p of productsData) {
+    // ── One-time seed of the default VIP catalog ──
+    // Preserve any products created or customized by an administrator on later
+    // runs, including after the catalog has been intentionally cleared.
+    const vipCatalogSeedKey = "bootstrap_vip_catalog_v1";
+    const vipCatalogSeed = await client.query(
+      "SELECT key FROM platform_settings WHERE key = $1 LIMIT 1",
+      [vipCatalogSeedKey]
+    );
+    if (vipCatalogSeed.rows.length === 0) {
+      const existingProducts = await client.query("SELECT id FROM products LIMIT 1");
+      if (existingProducts.rows.length === 0) {
+        const productsData = [
+          { name: "VIP1 — Kakubin", price: 3000, daily_earnings: 450, cycle_days: 60, total_return: 27000, sort_order: 1 },
+          { name: "VIP2 — Suntory Whisky Toki", price: 8000, daily_earnings: 1300, cycle_days: 60, total_return: 78000, sort_order: 2 },
+          { name: "VIP3 — Chita", price: 15000, daily_earnings: 1900, cycle_days: 60, total_return: 114000, sort_order: 3 },
+          { name: "VIP4 — Roku Gin", price: 20000, daily_earnings: 2900, cycle_days: 60, total_return: 174000, sort_order: 4 },
+          { name: "VIP5 — Hakushu", price: 30000, daily_earnings: 3600, cycle_days: 60, total_return: 216000, sort_order: 5 },
+          { name: "VIP6 — Yamazaki", price: 40000, daily_earnings: 4900, cycle_days: 60, total_return: 294000, sort_order: 6 },
+          { name: "VIP7 — Hibiki", price: 75000, daily_earnings: 8900, cycle_days: 60, total_return: 534000, sort_order: 7 },
+          { name: "VIP8 — Jim Beam", price: 150000, daily_earnings: 19000, cycle_days: 60, total_return: 1140000, sort_order: 8 },
+          { name: "VIP9 — Maker's Mark", price: 250000, daily_earnings: 25000, cycle_days: 60, total_return: 1500000, sort_order: 9 },
+          { name: "VIP10 — Sipsmith", price: 300000, daily_earnings: 39000, cycle_days: 60, total_return: 2340000, sort_order: 10 },
+        ];
+        for (const p of productsData) {
+          await client.query(
+            `INSERT INTO products (name, price, daily_earnings, cycle_days, total_return, is_free, is_active, sort_order)
+             VALUES ($1,$2,$3,$4,$5,false,true,$6)`,
+            [p.name, p.price, p.daily_earnings, p.cycle_days, p.total_return, p.sort_order]
+          );
+        }
+        console.log("✅ Catalogue VIP Suntory initialisé");
+      } else {
+        console.log("Catalogue existant conservé; aucun produit n'a été remplacé");
+      }
       await client.query(
-        `INSERT INTO products (name, price, daily_earnings, cycle_days, total_return, is_free, sort_order)
-         VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT DO NOTHING`,
-        [p.name, p.price, p.daily_earnings, p.cycle_days, p.total_return, p.is_free, p.sort_order]
+        "INSERT INTO platform_settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO NOTHING",
+        [vipCatalogSeedKey, "complete"]
       );
     }
-    console.log("✅ Produits insérés");
 
     // ── Seed tasks ──
     const tasksData = [

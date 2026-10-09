@@ -7,16 +7,16 @@ export default function RulesPage() {
     queryKey: ["/api/settings"],
   });
 
-  const signupBonus = settings?.signupBonus || "2040";
-  const minDeposit = settings?.minDeposit || "12240";
-  const minWithdrawal = settings?.minWithdrawal || "6120";
+  const signupBonus = settings?.signupBonus || "500";
+  const minDeposit = settings?.minDeposit || "3000";
+  const minWithdrawal = settings?.minWithdrawal || "1000";
   const withdrawalFees = settings?.withdrawalFees || "18";
   const withdrawalStartHour = settings?.withdrawalStartHour || "9";
   const withdrawalEndHour = settings?.withdrawalEndHour || "17";
   const maxWithdrawalsPerDay = settings?.maxWithdrawalsPerDay || "1";
-  const lv1 = settings?.level1Commission || "15";
-  const lv2 = settings?.level2Commission || "2";
-  const lv3 = settings?.level3Commission || "1";
+  const lv1 = settings?.level1Commission || "20";
+  const lv2 = settings?.level2Commission || "5";
+  const lv3 = settings?.level3Commission || "2";
 
   return (
     <div className="flex flex-col min-h-full" style={{ background: "#111" }}>
@@ -35,7 +35,7 @@ export default function RulesPage() {
           <ul className="list-disc pl-5 space-y-1">
             <li>Chaque utilisateur peut posséder plusieurs produits d'investissement simultanément.</li>
             <li>Les revenus sont générés quotidiennement et accrédités sur votre solde de compte toutes les 24 heures.</li>
-            <li>Le cycle d'investissement standard est de 80 jours, sauf indication contraire pour les produits spéciaux.</li>
+            <li>Les produits VIP ont une durée de 60 jours.</li>
           </ul>
         </section>
 

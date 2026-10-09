@@ -17,7 +17,7 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
   });
 
   const groupLink = settings?.groupLink || "https://t.me/sybotx";
-  const signupBonus = formatAmount(settings?.signupBonus, "2040");
+  const signupBonus = formatAmount(settings?.signupBonus, "500");
   const level1Commission = settings?.level1Commission || "20";
   const level2Commission = settings?.level2Commission || "5";
   const level3Commission = settings?.level3Commission || "2";
@@ -39,14 +39,14 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
               Plate-forme
             </DialogTitle>
             <DialogDescription className="sr-only">
-              Informations de bienvenue sur la plateforme TELD.
+              Informations de bienvenue sur la plateforme Suntory.
             </DialogDescription>
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto px-[31px] text-[16px] leading-[1.52]">
-            <p className="mb-[21px]">✨Bienvenue chez TELD !</p>
+            <p className="mb-[21px]">✨Bienvenue chez Suntory !</p>
             <p className="mb-[18px]">
-              ✔️ L'application de recharge et d'investissement la plus fiable !
+              Fondé en 1899 à Osaka par Shinjiro Torii, le Groupe Suntory est aujourd’hui présent dans les boissons alcoolisées, les boissons sans alcool et les produits de santé.
             </p>
             <div className="space-y-[2px]">
               <p>➤ Les nouveaux utilisateurs reçoivent {signupBonus} FCFA à l'inscription.</p>
@@ -57,7 +57,7 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
               <p>➤ Dépôts et retraits 24 h/24 et 7 j/7.</p>
               <p>
                 ➤ Bénéficiez de rendements stables sur vos investissements individuels pendant
-                100 jours maximum.
+                 60 jours maximum.
               </p>
             </div>
             <p className="mt-[25px]">↪️ Commencez à bâtir votre patrimoine dès aujourd'hui !</p>

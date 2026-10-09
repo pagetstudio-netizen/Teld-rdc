@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import AboutModal from "@/components/about-modal";
 
-import dashboardBanner from "@assets/20260823_193216_1787513989515.png";
-import chargingCanopy from "@assets/20260823_193248_1787513989579.png";
-import chargingEquipment from "@assets/image_search/teld-equipment.png";
+import { spiritsCollection, spiritsLineup, whiskyBottle1 } from "@/lib/suntory-assets";
 import announcementIcon from "@assets/téléchargement_(91)_1787514048111.png";
 
 function formatAmount(value: number) {
@@ -28,7 +26,7 @@ export default function HomePage() {
 
   return (
     <>
-      <main className="teld-dashboard-reference" aria-label="Accueil TELD">
+      <main className="teld-dashboard-reference" aria-label="Accueil Suntory">
       <style>{`
         .teld-dashboard-reference {
           min-height: 100dvh;
@@ -52,11 +50,11 @@ export default function HomePage() {
         }
         .teld-dashboard-reference__hero {
           width: calc(100% - clamp(30px, 8.6vw, 44px));
-          aspect-ratio: 165 / 140;
+          aspect-ratio: 2.145 / 1;
           margin: 0 auto;
           overflow: hidden;
           border-radius: clamp(9px, 2.35vw, 12px);
-          background: #eaf0ff;
+          background: #e7f5f8;
         }
         .teld-dashboard-reference__hero img {
           display: block;
@@ -214,8 +212,8 @@ export default function HomePage() {
       `}</style>
 
       <div className="teld-dashboard-reference__screen">
-        <section className="teld-dashboard-reference__hero" aria-label="TELD, un nouveau monde pour votre succès">
-          <img src={dashboardBanner} alt="TELD, un nouveau monde pour votre succès" />
+        <section className="teld-dashboard-reference__hero" aria-label="Suntory, boissons et produits de santé">
+          <img src={spiritsCollection} alt="Sélection de boissons du Groupe Suntory" />
         </section>
 
         <section className="teld-dashboard-reference__announcement" aria-label="Annonce de recharges">
@@ -231,7 +229,7 @@ export default function HomePage() {
         <section className="teld-dashboard-reference__metrics" aria-label="Résumé du compte">
           <article className="teld-dashboard-reference__metric">
             <div className="teld-dashboard-reference__station">
-              <img src={chargingCanopy} alt="Station de recharge TELD" />
+              <img src={spiritsLineup} alt="Gamme de boissons Suntory" />
             </div>
             <div className="teld-dashboard-reference__metric-copy">
               <span className="teld-dashboard-reference__metric-label">Solde</span>
@@ -241,7 +239,7 @@ export default function HomePage() {
 
           <article className="teld-dashboard-reference__metric">
             <div className="teld-dashboard-reference__station teld-dashboard-reference__station--equipment">
-              <img src={chargingEquipment} alt="Borne de recharge TELD" />
+              <img src={whiskyBottle1} alt="Produit de la gamme Suntory" />
             </div>
             <div className="teld-dashboard-reference__metric-copy">
               <span className="teld-dashboard-reference__metric-label">Cumulatif</span>

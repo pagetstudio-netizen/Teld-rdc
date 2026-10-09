@@ -3,10 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
-import teamInviteImage from "@assets/images_(73)_1787505348499.jpeg";
-import teamInviteImageAlt from "@assets/images_(74)_1787505348522.jpeg";
-import teamMetricImage from "@assets/images_(75)_1787505348408.jpeg";
-import teamMetricImageAlt from "@assets/images_(76)_1787505348483.jpeg";
+import { bottlingLine, productionFloor, spiritsCollection, spiritsLineup } from "@/lib/suntory-assets";
 
 interface TeamStats {
   level1Count: number;
@@ -63,7 +60,7 @@ export default function TeamPage() {
           min-height: 100dvh;
           overflow-x: hidden;
           padding-bottom: 88px;
-           background: linear-gradient(180deg, #063841 0%, #00636c 100%);
+           background: linear-gradient(180deg, #153f4a 0%, #185868 100%);
           color: white;
           font-family: Arial, Helvetica, sans-serif;
         }
@@ -115,7 +112,7 @@ export default function TeamPage() {
           height: 156px;
           overflow: hidden;
           border-radius: 22px;
-           background: #00636c;
+           background: #185868;
         }
          .team-reference-page .invite-art img,
          .team-reference-page .metric-art img {
@@ -164,8 +161,8 @@ export default function TeamPage() {
           place-items: center;
           border: 0;
           border-radius: 8px;
-           background: #00ABB7;
-           color: #063841;
+           background: #247f91;
+           color: #153f4a;
            font-size: clamp(13px, 3.2cqw, 16px);
           font-weight: 400;
           line-height: 1;
@@ -220,7 +217,7 @@ export default function TeamPage() {
           align-items: center;
           justify-content: center;
           border-radius: 18px;
-           background: #00ABB7;
+           background: #247f91;
           color: white;
            font-size: clamp(16px, 4.2cqw, 21px);
           font-weight: 400;
@@ -269,7 +266,7 @@ export default function TeamPage() {
          .team-reference-page .metric-art {
           height: 137px;
            overflow: hidden;
-           background: #00636c;
+           background: #185868;
         }
         .team-reference-page .metric-footer {
            display: grid;
@@ -298,7 +295,7 @@ export default function TeamPage() {
           left: 0;
           z-index: 50;
           height: 80px;
-          background: #00ABB7;
+          background: #247f91;
         }
         @media (max-width: 360px) {
           .team-reference-page .team-header { height: 70px; padding: 0 15px; }
@@ -336,7 +333,7 @@ export default function TeamPage() {
         <section className="invite-grid" aria-label="Invitation">
           <div className="invite-column">
            <div className="invite-art">
-             <img src={teamInviteImage} alt="Borne de recharge TELD" />
+             <img src={spiritsCollection} alt="Gamme de boissons Suntory" />
              <div className="invite-copy">
                <span className="invite-value">{user.referralCode}</span>
                <span className="invite-label">Code d'invitation</span>
@@ -348,7 +345,7 @@ export default function TeamPage() {
           </div>
           <div className="invite-column">
            <div className="invite-art">
-             <img src={teamInviteImageAlt} alt="Station de recharge TELD" />
+             <img src={spiritsLineup} alt="Produits du Groupe Suntory" />
              <div className="invite-copy">
                <span className="invite-value" title={referralLink}>{referralLink}</span>
                <span className="invite-label">Lien d'invitation</span>
@@ -386,7 +383,7 @@ export default function TeamPage() {
             onClick={() => navigate("/team-details")}
           >
             <div className="metric-art">
-              <img src={teamMetricImage} alt="Réseau de bornes TELD" />
+              <img src={bottlingLine} alt="Ligne de production de boissons Suntory" />
             </div>
             <div className="metric-footer"><span>{totalPeople}</span><span>Total utilisateurs &gt;</span></div>
           </button>
@@ -397,7 +394,7 @@ export default function TeamPage() {
             onClick={() => navigate("/team-details")}
           >
              <div className="metric-art">
-               <img src={teamMetricImageAlt} alt="Station de recharge TELD" />
+               <img src={productionFloor} alt="Site de production de boissons" />
              </div>
             <div className="metric-footer"><span>{Number(stats?.totalCommission || 0).toLocaleString("fr-FR")}</span><span>Recompenses totales<br />&gt;</span></div>
           </button>

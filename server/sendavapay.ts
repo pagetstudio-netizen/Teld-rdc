@@ -45,10 +45,12 @@ export function toSendavapayCountry(appCountry: string): string {
   return COUNTRY_CODE_MAP[appCountry] || appCountry;
 }
 
-export function formatPhone(phone: string, country: string): string {
+export function formatPhone(phone: string, country: string, configuredPrefix?: string): string {
   const cleaned = phone.replace(/[\s\-\+]/g, "");
   const appCountry = COUNTRY_CODE_MAP[country] ? country : country;
-  const prefix = PHONE_PREFIX_MAP[appCountry] || PHONE_PREFIX_MAP[toSendavapayCountry(appCountry)];
+  const prefix = configuredPrefix?.replace(/\D/g, "")
+    || PHONE_PREFIX_MAP[appCountry]
+    || PHONE_PREFIX_MAP[toSendavapayCountry(appCountry)];
   if (!prefix) return `+${cleaned}`;
   if (cleaned.startsWith(prefix)) return `+${cleaned}`;
   if (cleaned.startsWith("0")) return `+${prefix}${cleaned.substring(1)}`;

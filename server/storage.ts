@@ -163,11 +163,11 @@ export class DatabaseStorage implements IStorage {
     const referralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
     const hashedPassword = await bcrypt.hash(data.password!, 10);
 
-    // Get signup bonus from settings (default 200)
-    let signupBonus = "200";
+    // Get signup bonus from settings (default 500 FCFA)
+    let signupBonus = "500";
     try {
       const settings = await this.getSettings();
-      signupBonus = settings.signupBonus || "200";
+      signupBonus = settings.signupBonus || "500";
     } catch {}
 
     const [user] = await db.insert(users).values({
@@ -350,9 +350,9 @@ export class DatabaseStorage implements IStorage {
     if (!user || !user.referredBy) return;
 
     const settings = await this.getSettings();
-    const level1Rate = parseFloat(settings.level1Commission || "27") / 100;
-    const level2Rate = parseFloat(settings.level2Commission || "2") / 100;
-    const level3Rate = parseFloat(settings.level3Commission || "1") / 100;
+    const level1Rate = parseFloat(settings.level1Commission || "20") / 100;
+    const level2Rate = parseFloat(settings.level2Commission || "5") / 100;
+    const level3Rate = parseFloat(settings.level3Commission || "2") / 100;
 
     // Level 1
     const level1User = await this.getUserByReferralCode(user.referredBy);
@@ -1326,7 +1326,7 @@ export class DatabaseStorage implements IStorage {
     const user = await this.getUser(userId);
     if (!user) throw new Error("Utilisateur introuvable");
     if (parseFloat(user.balance) < sp.price) {
-      throw new Error(`Solde insuffisant. Il vous manque ${(sp.price - parseFloat(user.balance)).toLocaleString()} CDF`);
+      throw new Error(`Solde insuffisant. Il vous manque ${(sp.price - parseFloat(user.balance)).toLocaleString()} FCFA`);
     }
 
     // Check user has at least one active regular product
